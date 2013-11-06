@@ -1,0 +1,30 @@
+{
+    "name": "instaclick/base-behat-bundle",
+    "description": "This bundle provides basic behat support for Dating Engine",
+    "keywords": ["base", "behat", "test"],
+    "type": "symfony-bundle",
+    "authors": [
+        {
+            "name": "InstaClick Inc.",
+            "homepage": "http://www.instaclick.com"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://satis.dev:8080/"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2",
+        "symfony/symfony": "2.2.*"
+    },
+    "require-dev": {
+        "phpunit/PHPUnit": "3.7.*"
+    },
+    "autoload": {
+        "psr-0": { "IC\\Bundle\\Base\\BehatBundle": "" }
+    },
+    "target-dir": "IC/Bundle/Base/BehatBundle",
+    "minimum-stability": "dev"
+}

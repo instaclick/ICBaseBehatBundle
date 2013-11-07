@@ -537,15 +537,19 @@ JS;
      */
     protected function elementShouldExist($elementId)
     {
-        $assertElementExistsJavaScript = <<<JS
-            var targetElement = document.getElementById('$elementId');
+        $that = $this;
 
-            return !! targetElement;
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($elementId, $that) {
+            $assertElementExistsJavaScript = <<<JS
+                var targetElement = document.getElementById('$elementId');
+
+                return !! targetElement;
 JS;
-        $this->assertByJavaScript(
-            $assertElementExistsJavaScript,
-            'The target element with id="' . $elementId . '" does not exist.'
-        );
+            $that->assertByJavaScript(
+                $assertElementExistsJavaScript,
+                'The target element with id="' . $elementId . '" does not exist.'
+            );
+        });
     }
 
     /**
@@ -569,17 +573,15 @@ JS;
      */
     public function elementAtXPathShouldExist($xPath)
     {
-        $retrieveElementJavaScript = $this->getRetrieveElementByXPathJavaScript($xPath);
+        $that = $this;
 
-        $assertElementAtXPathExistsJavaScript = <<<JS
-            var targetElement = $retrieveElementJavaScript;
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xPath, $that) {
+            $element = $that->findElementByXpath($xPath);
 
-            return !! targetElement;
-JS;
-        $this->assertByJavaScript(
-            $assertElementAtXPathExistsJavaScript,
-            'The target element at XPath="' . $xPath . '" does not exist (which should).'
-        );
+            if ( ! $element) {
+                throw new ElementNotFoundException($that->getSession(), 'element', 'xpath', $xPath);
+            }
+        });
     }
 
     /**
@@ -878,7 +880,11 @@ JS;
      */
     public function assertElementContainsText($xpath, $text)
     {
-        $this->assertSession()->elementTextContains('xpath', $xpath, $this->fixStepArgument($text));
+        $that = $this;
+
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xpath, $text, $that) {
+            $that->assertSession()->elementTextContains('xpath', $xpath, $that->fixStepArgument($text));
+        });
     }
 
     /**
@@ -936,15 +942,20 @@ JS;
      */
     public function clickElementByXPath($xPath)
     {
-        $element = $this->findElementByXpath($xPath);
+        $that = $this;
 
-        if ( ! $element) {
-            $message = 'Could not find the element by the given XPath: ' . $xPath;
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xPath, $that) {
+            $element = $that->findElementByXpath($xPath);
 
-            throw new \Exception($message);
-        }
+            if ( ! $element) {
+                $message = 'Could not find the element by the given XPath: ' . $xPath;
 
-        $element->click();
+                throw new \Exception($message);
+            }
+
+            $element->click();
+        });
+
     }
 
     /**
@@ -1126,7 +1137,7 @@ JS;
      *
      * @return NodeElement|null
      */
-    private function findElementByXpath($xPath)
+    public function findElementByXpath($xPath)
     {
         return $this->getSession()->getPage()->find('xpath', $xPath);
     }
@@ -1228,7 +1239,7 @@ JS;
      *
      * @return string
      */
-    protected function fixStepArgument($argument)
+    public function fixStepArgument($argument)
     {
         return str_replace('\\"', '"', $argument);
     }
@@ -1445,7 +1456,11 @@ JS;
      */
     public function assertElementAtXpathDoesNotContainText($text, $xPath)
     {
-        $this->assertSession()->elementTextNotContains('xpath', $xPath, $this->fixStepArgument($text));
+        $that = $this;
+
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xPath, $text, $that) {
+            $that->assertSession()->elementTextNotContains('xpath', $xPath, $that->fixStepArgument($text));
+        });
     }
 
     /**

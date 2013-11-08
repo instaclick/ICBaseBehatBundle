@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  * Ui Interaction subcontext
  *
  * @author Yuan Xie <shayx@nationalfibre.net>
+ * @author Anthony Bieber <anthonyb@nationalfibre.net>
  */
 class UiInteractionContext extends RawMinkContext implements KernelAwareInterface
 {
@@ -1004,6 +1005,19 @@ JS;
         }
 
         $element->setValue($value);
+    }
+
+    /**
+     * Enter a multiline string (Pystring) into a textbox
+     *
+     * @param string       $textbox  name of text box to be filled with a Pystring
+     * @param PyStringNode $pyString the pystring to be submitted
+     *
+     * @Given /^(?:|I ) fill in "([^"]+)" with:/
+     */
+    public function fillInTextBoxWithPystring($textbox, PyStringNode $pyString)
+    {
+        $this->createPost($textbox, $pyString->getRaw());
     }
 
     /**

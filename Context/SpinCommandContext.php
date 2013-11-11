@@ -22,7 +22,7 @@ class SpinCommandContext extends RawMinkContext
      * @param integer $attemptThreshold Number of attempts to execute the command.
      * @param integer $interval         Interval in milliseconds to wait after an attempt.
      */
-    public function spin($lambda, $attemptThreshold = 10, $interval = 1)
+    public function spin($lambda, $attemptThreshold = 15, $interval = 1)
     {
         for ($iterations = 1; $iterations <= $attemptThreshold; $iterations++) {
             try {

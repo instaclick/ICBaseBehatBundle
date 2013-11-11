@@ -193,4 +193,20 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         $client = new Client;
         $client->post($url)->send();
     }
+
+    /**
+     * Checks, that page contains text matching specified pattern.
+     *
+     * @param string $pattern the pattern needs to be matched for the text on the page
+     *
+     * @Then /^(?:|I )should see the text matching (?P<pattern>"(?:[^"]|\\")*")$/
+     */
+    public function pageMatchesText($pattern)
+    {
+        $that = $this;
+
+        $this->getMainContext()->getSubcontext('SpinCommandContext')->spin(function () use ($pattern, $that) {
+            $that->assertPageMatchesText($pattern);
+        });
+    }
 }

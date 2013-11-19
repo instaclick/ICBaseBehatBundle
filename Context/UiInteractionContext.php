@@ -1298,33 +1298,22 @@ JS;
      */
     public function elementAtXPathShouldBeVisible($xPath)
     {
-        $this->elementAtXPathShouldExist($xPath);
+        $that = $this;
 
-        $element = $this->getRetrieveElementByXPathJavaScript($xPath);
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xPath, $that) {
+            $element = $that->findElementByXpath($xPath);
 
-        // Create a function to test visibilty
-        $isVisibleJavascript = <<<JS
-            function isVisible(element) {
-                var cs = window.getComputedStyle && window.getComputedStyle(element) ||
-                         this.browserBot && this.browserbot.getCurrentWindow().getComputedStyle(element);
-
-                return (cs.display !== "none" &&
-                    cs.visibility === "visible" &&
-                    parseInt(cs.height) > 0 &&
-                    parseInt(cs.width) > 0 &&
-                    parseFloat(cs.opacity) > 0);
+            if ( ! $element) {
+                throw new ElementNotFoundException($that->getSession(), 'element', 'xpath', $xPath);
             }
 
-            var targetElement = $element;
-
-            return isVisible(targetElement);
-JS;
-
-        // Return the result
-        $this->assertByJavaScript(
-            $isVisibleJavascript,
-            "The target element\'s CSS renders it hidden (when should be visible)."
-        );
+            if ( ! $element->isVisible()) {
+                throw new \Exception(sprintf(
+                    'The target element at XPath "%s" is hidden (while it should be visible)',
+                    $xPath
+                ));
+            }
+        });
     }
 
     /**
@@ -1336,33 +1325,22 @@ JS;
      */
     public function elementAtXPathShouldBeHidden($xPath)
     {
-        $this->elementAtXPathShouldExist($xPath);
+        $that = $this;
 
-        $element = $this->getRetrieveElementByXPathJavaScript($xPath);
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xPath, $that) {
+            $element = $that->findElementByXpath($xPath);
 
-        // Create a function to test visibilty
-        $isHiddenJavascript = <<<JS
-            function isVisible(element) {
-                var cs = window.getComputedStyle && window.getComputedStyle(element) ||
-                         this.browserBot && this.browserbot.getCurrentWindow().getComputedStyle(element);
-
-                return (cs.display !== "none" &&
-                    cs.visibility === "visible" &&
-                    parseInt(cs.height) > 0 &&
-                    parseInt(cs.width) > 0 &&
-                    parseFloat(cs.opacity) > 0);
+            if ( ! $element) {
+                throw new ElementNotFoundException($that->getSession(), 'element', 'xpath', $xPath);
             }
 
-            var targetElement = $element;
-
-            return !isVisible(targetElement);
-JS;
-
-        // Return the result
-        $this->assertByJavaScript(
-            $isHiddenJavascript,
-            "The target element's CSS renders it visible (when it should be hidden)."
-        );
+            if ($element->isVisible()) {
+                throw new \Exception(sprintf(
+                    'The target element at XPath "%s" is visible (while it should be hidden)',
+                    $xPath
+                ));
+            }
+        });
     }
 
     /**
@@ -1458,11 +1436,7 @@ JS;
      */
     public function assertElementAtXpathDoesNotContainText($text, $xPath)
     {
-        $that = $this;
-
-        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xPath, $text, $that) {
-            $that->assertSession()->elementTextNotContains('xpath', $xPath, $that->fixStepArgument($text));
-        });
+        $this->assertSession()->elementTextNotContains('xpath', $xPath, $this->fixStepArgument($text));
     }
 
     /**

@@ -559,7 +559,7 @@ JS;
      *
      * @return string
      */
-    protected function getRetrieveElementByXPathJavaScript($xPath)
+    public function getRetrieveElementByXPathJavaScript($xPath)
     {
         return 'document.evaluate("'. $xPath . '" ,document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue';
     }
@@ -755,21 +755,25 @@ JS;
      */
     public function elementAtXPathHasAttributeOfValue($xPath, $elementAttributeName, $elementAttributeTargetValue)
     {
-        $this->elementAtXPathAttributeShouldExist($xPath, $elementAttributeName);
+        $that = $this;
 
-        $retrieveElementJavaScript = $this->getRetrieveElementByXPathJavaScript($xPath);
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xPath, $elementAttributeName, $elementAttributeTargetValue, $that) {
+            $that->elementAtXPathAttributeShouldExist($xPath, $elementAttributeName);
 
-        $retrieveElementAttributeValueJavaScript = <<<JS
-            return $retrieveElementJavaScript.getAttribute('$elementAttributeName');
+            $retrieveElementJavaScript = $that->getRetrieveElementByXPathJavaScript($xPath);
+
+            $retrieveElementAttributeValueJavaScript = <<<JS
+                return $retrieveElementJavaScript.getAttribute('$elementAttributeName');
 JS;
 
-        $retrievedAttribute = $this->getSession()->evaluateScript($retrieveElementAttributeValueJavaScript);
+            $retrievedAttribute = $that->getSession()->evaluateScript($retrieveElementAttributeValueJavaScript);
 
-        if ($retrievedAttribute != $elementAttributeTargetValue) {
-            $message = 'The target element attribute "' . $elementAttributeTargetValue . '" does not match the element attribute\'s actual value "'. $retrievedAttribute . '"';
+            if ($retrievedAttribute != $elementAttributeTargetValue) {
+                $message = 'The target element attribute "' . $elementAttributeTargetValue . '" does not match the element attribute\'s actual value "'. $retrievedAttribute . '"';
 
-            throw new \Exception($message);
-        }
+                throw new \Exception($message);
+            }
+        });
     }
 
     /**
@@ -1028,80 +1032,84 @@ JS;
      */
     public function hoverMouseOverElementByXPath($xPath)
     {
-        // set up page to respond to simulated hover events by augmenting CSS and listening to mouseover events
-        // NOTE: this initialization will run only once
-        $setupJs = <<<JS
-            (function(window, document, $) {
-                var checkForHover     = /^[^{]*:hover/,
-                    cssRuleStructure  = /^([^\{]*)(\{.*\}[^\}]*)$/,
-                    allHoverSelectors = /:hover/g,
-                    replacementClass  = '__simulatedHover__';
+        $that = $this;
 
-                // run initialization only once
-                if (window.simulatedHoverCssInjected) {
-                    return;
-                }
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xPath, $that) {
+            // set up page to respond to simulated hover events by augmenting CSS and listening to mouseover events
+            // NOTE: this initialization will run only once
+            $setupJs = <<<JS
+                (function(window, document, $) {
+                    var checkForHover     = /^[^{]*:hover/,
+                        cssRuleStructure  = /^([^\{]*)(\{.*\}[^\}]*)$/,
+                        allHoverSelectors = /:hover/g,
+                        replacementClass  = '__simulatedHover__';
 
-                window.simulatedHoverCssInjected = true;
+                    // run initialization only once
+                    if (window.simulatedHoverCssInjected) {
+                        return;
+                    }
 
-                $.each(document.styleSheets, function (i, stylesheet) {
-                    var replacementClassSelector = '.' + replacementClass;
+                    window.simulatedHoverCssInjected = true;
 
-                    $.each(stylesheet.cssRules, function (ruleIndex, rule) {
-                        // if the hover selector is present in the CSS rule, mirror it with the simulated hover class
-                        if (!checkForHover.exec(rule.cssText)) {
-                            return;
-                        }
+                    $.each(document.styleSheets, function (i, stylesheet) {
+                        var replacementClassSelector = '.' + replacementClass;
 
-                        var ruleText              = rule.cssText,
-                            parts                 = cssRuleStructure.exec(ruleText),
-                            selectorParts         = parts[1].split(','),
-                            declaration           = parts[2],
-                            modifiedSelectorParts = [],
-                            modifiedRuleText;
-
-                        // process the comma-separated parts of the original selector
-                        $.each(selectorParts, function (_, selectorPart) {
-                            // simply replace the hover pseudo-class with the custom class
-                            // NOTE: this does not handle potential occurrences inside [attr="xyz"] type selectors
-                            var modifiedSelectorPart = selectorPart.replace(allHoverSelectors, replacementClassSelector);
-
-                            // only use the parts that were affected by the replacement
-                            if (modifiedSelectorPart !== selectorPart) {
-                                modifiedSelectorParts.push(modifiedSelectorPart);
+                        $.each(stylesheet.cssRules, function (ruleIndex, rule) {
+                            // if the hover selector is present in the CSS rule, mirror it with the simulated hover class
+                            if (!checkForHover.exec(rule.cssText)) {
+                                return;
                             }
+
+                            var ruleText              = rule.cssText,
+                                parts                 = cssRuleStructure.exec(ruleText),
+                                selectorParts         = parts[1].split(','),
+                                declaration           = parts[2],
+                                modifiedSelectorParts = [],
+                                modifiedRuleText;
+
+                            // process the comma-separated parts of the original selector
+                            $.each(selectorParts, function (_, selectorPart) {
+                                // simply replace the hover pseudo-class with the custom class
+                                // NOTE: this does not handle potential occurrences inside [attr="xyz"] type selectors
+                                var modifiedSelectorPart = selectorPart.replace(allHoverSelectors, replacementClassSelector);
+
+                                // only use the parts that were affected by the replacement
+                                if (modifiedSelectorPart !== selectorPart) {
+                                    modifiedSelectorParts.push(modifiedSelectorPart);
+                                }
+                            });
+
+                            // add modified selectors as a new rule right after current one (to respect CSS cascade priority)
+                            // NOTE: directly changing original rule.cssText does not work
+                            modifiedRuleText = modifiedSelectorParts.join(',') + declaration;
+
+                            stylesheet.insertRule(modifiedRuleText, ruleIndex + 1);
                         });
-
-                        // add modified selectors as a new rule right after current one (to respect CSS cascade priority)
-                        // NOTE: directly changing original rule.cssText does not work
-                        modifiedRuleText = modifiedSelectorParts.join(',') + declaration;
-
-                        stylesheet.insertRule(modifiedRuleText, ruleIndex + 1);
                     });
-                });
 
-                $(document).on('mouseover', '*', function() {
-                    $(this).addClass(replacementClass);
-                });
+                    $(document).on('mouseover', '*', function() {
+                        $(this).addClass(replacementClass);
+                    });
 
-                $(document).on('mouseout', '*', function() {
-                    $(this).removeClass(replacementClass);
-                });
-            })(window, document, jQuery)
+                    $(document).on('mouseout', '*', function() {
+                        $(this).removeClass(replacementClass);
+                    });
+                })(window, document, jQuery)
 JS;
 
-        $this->getSession()->evaluateScript($setupJs);
+            $that->getSession()->evaluateScript($setupJs);
 
-        // perform the actual hover
-        $element = $this->findElementByXpath($xPath);
+            // perform the actual hover
+            $element = $that->findElementByXpath($xPath);
 
-        if ( ! $element) {
-            $message = 'Could not find the element by the given XPath: ' . $xPath;
+            if ( ! $element) {
+                $message = 'Could not find the element by the given XPath: ' . $xPath;
 
-            throw new \Exception($message);
-        }
+                throw new \Exception($message);
+            }
 
-        $element->mouseOver();
+            $element->mouseOver();
+        });
     }
 
     /**

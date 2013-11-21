@@ -169,14 +169,17 @@ class FileContext extends RawMinkContext implements KernelAwareInterface
 
         $commandFormat = $this->env ? 'BEHAT_PARAMS="%s" %s %s %s' : '%.0s%s %s %s --no-time';
 
-        exec($command = sprintf($commandFormat,
-            $this->env,
-            BEHAT_PHP_BIN_PATH,
-            escapeshellarg(BEHAT_BIN_PATH),
-            $argumentsString
-        ),
+        exec(
+            $command = sprintf(
+                $commandFormat,
+                $this->env,
+                BEHAT_PHP_BIN_PATH,
+                escapeshellarg(BEHAT_BIN_PATH),
+                $argumentsString
+            ),
             $output,
-            $return);
+            $return
+        );
 
         $this->command = 'behat ' . $argumentsString;
         $this->output  = trim(implode("\n", $output));
@@ -324,23 +327,33 @@ class FileContext extends RawMinkContext implements KernelAwareInterface
 
         // windows path fix
         if ('/' !== DIRECTORY_SEPARATOR) {
-            $text = preg_replace_callback('/ features\/[^\n ]+/',
+            $text = preg_replace_callback(
+                '/ features\/[^\n ]+/',
                 function ($matches) {
-                return str_replace('/', DIRECTORY_SEPARATOR, $matches[0]);
+                    return str_replace('/', DIRECTORY_SEPARATOR, $matches[0]);
                 },
-                (string) $text);
-            $text = preg_replace_callback('/\<span class\="path"\>features\/[^\<]+/',
+                (string) $text
+            );
+
+            $text = preg_replace_callback(
+                '/\<span class\="path"\>features\/[^\<]+/',
                 function ($matches) {
-                return str_replace('/',
-                    DIRECTORY_SEPARATOR,
-                    $matches[0]);
+                    return str_replace(
+                        '/',
+                        DIRECTORY_SEPARATOR,
+                        $matches[0]
+                    );
                 },
-                (string) $text);
-            $text = preg_replace_callback('/\+[fd] [^ ]+/',
+                (string) $text
+            );
+
+            $text = preg_replace_callback(
+                '/\+[fd] [^ ]+/',
                 function ($matches) {
-                return str_replace('/', DIRECTORY_SEPARATOR, $matches[0]);
+                    return str_replace('/', DIRECTORY_SEPARATOR, $matches[0]);
                 },
-                (string) $text);
+                (string) $text
+            );
         }
 
         try {

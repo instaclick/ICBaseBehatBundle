@@ -538,15 +538,19 @@ JS;
      */
     protected function elementShouldExist($elementId)
     {
-        $assertElementExistsJavaScript = <<<JS
-            var targetElement = document.getElementById('$elementId');
+        $that = $this;
 
-            return !! targetElement;
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($elementId, $that) {
+            $assertElementExistsJavaScript = <<<JS
+                var targetElement = document.getElementById('$elementId');
+
+                return !! targetElement;
 JS;
-        $this->assertByJavaScript(
-            $assertElementExistsJavaScript,
-            'The target element with id="' . $elementId . '" does not exist.'
-        );
+            $that->assertByJavaScript(
+                $assertElementExistsJavaScript,
+                'The target element with id="' . $elementId . '" does not exist.'
+            );
+        });
     }
 
     /**
@@ -556,7 +560,7 @@ JS;
      *
      * @return string
      */
-    protected function getRetrieveElementByXPathJavaScript($xPath)
+    public function getRetrieveElementByXPathJavaScript($xPath)
     {
         return 'document.evaluate("'. $xPath . '" ,document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue';
     }
@@ -570,17 +574,15 @@ JS;
      */
     public function elementAtXPathShouldExist($xPath)
     {
-        $retrieveElementJavaScript = $this->getRetrieveElementByXPathJavaScript($xPath);
+        $that = $this;
 
-        $assertElementAtXPathExistsJavaScript = <<<JS
-            var targetElement = $retrieveElementJavaScript;
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xPath, $that) {
+            $element = $that->findElementByXpath($xPath);
 
-            return !! targetElement;
-JS;
-        $this->assertByJavaScript(
-            $assertElementAtXPathExistsJavaScript,
-            'The target element at XPath="' . $xPath . '" does not exist (which should).'
-        );
+            if ( ! $element) {
+                throw new ElementNotFoundException($that->getSession(), 'element', 'xpath', $xPath);
+            }
+        });
     }
 
     /**
@@ -754,21 +756,25 @@ JS;
      */
     public function elementAtXPathHasAttributeOfValue($xPath, $elementAttributeName, $elementAttributeTargetValue)
     {
-        $this->elementAtXPathAttributeShouldExist($xPath, $elementAttributeName);
+        $that = $this;
 
-        $retrieveElementJavaScript = $this->getRetrieveElementByXPathJavaScript($xPath);
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xPath, $elementAttributeName, $elementAttributeTargetValue, $that) {
+            $that->elementAtXPathAttributeShouldExist($xPath, $elementAttributeName);
 
-        $retrieveElementAttributeValueJavaScript = <<<JS
-            return $retrieveElementJavaScript.getAttribute('$elementAttributeName');
+            $retrieveElementJavaScript = $that->getRetrieveElementByXPathJavaScript($xPath);
+
+            $retrieveElementAttributeValueJavaScript = <<<JS
+                return $retrieveElementJavaScript.getAttribute('$elementAttributeName');
 JS;
 
-        $retrievedAttribute = $this->getSession()->evaluateScript($retrieveElementAttributeValueJavaScript);
+            $retrievedAttribute = $that->getSession()->evaluateScript($retrieveElementAttributeValueJavaScript);
 
-        if ($retrievedAttribute != $elementAttributeTargetValue) {
-            $message = 'The target element attribute "' . $elementAttributeTargetValue . '" does not match the element attribute\'s actual value "'. $retrievedAttribute . '"';
+            if ($retrievedAttribute != $elementAttributeTargetValue) {
+                $message = 'The target element attribute "' . $elementAttributeTargetValue . '" does not match the element attribute\'s actual value "'. $retrievedAttribute . '"';
 
-            throw new \Exception($message);
-        }
+                throw new \Exception($message);
+            }
+        });
     }
 
     /**
@@ -879,7 +885,11 @@ JS;
      */
     public function assertElementContainsText($xpath, $text)
     {
-        $this->assertSession()->elementTextContains('xpath', $xpath, $this->fixStepArgument($text));
+        $that = $this;
+
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xpath, $text, $that) {
+            $that->assertSession()->elementTextContains('xpath', $xpath, $that->fixStepArgument($text));
+        });
     }
 
     /**
@@ -937,15 +947,22 @@ JS;
      */
     public function clickElementByXPath($xPath)
     {
-        $element = $this->findElementByXpath($xPath);
+        $that = $this;
 
-        if ( ! $element) {
-            $message = 'Could not find the element by the given XPath: ' . $xPath;
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xPath, $that) {
+            $element = $that->findElementByXpath($xPath);
 
-            throw new \Exception($message);
-        }
+            if ( ! $element) {
+                $message = 'Could not find the element by the given XPath: ' . $xPath;
 
-        $element->click();
+                throw new \Exception($message);
+            }
+
+            $element->click();
+
+            usleep(1000);
+        });
+
     }
 
     /**
@@ -1029,80 +1046,84 @@ JS;
      */
     public function hoverMouseOverElementByXPath($xPath)
     {
-        // set up page to respond to simulated hover events by augmenting CSS and listening to mouseover events
-        // NOTE: this initialization will run only once
-        $setupJs = <<<JS
-            (function(window, document, $) {
-                var checkForHover     = /^[^{]*:hover/,
-                    cssRuleStructure  = /^([^\{]*)(\{.*\}[^\}]*)$/,
-                    allHoverSelectors = /:hover/g,
-                    replacementClass  = '__simulatedHover__';
+        $that = $this;
 
-                // run initialization only once
-                if (window.simulatedHoverCssInjected) {
-                    return;
-                }
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xPath, $that) {
+            // set up page to respond to simulated hover events by augmenting CSS and listening to mouseover events
+            // NOTE: this initialization will run only once
+            $setupJs = <<<JS
+                (function(window, document, $) {
+                    var checkForHover     = /^[^{]*:hover/,
+                        cssRuleStructure  = /^([^\{]*)(\{.*\}[^\}]*)$/,
+                        allHoverSelectors = /:hover/g,
+                        replacementClass  = '__simulatedHover__';
 
-                window.simulatedHoverCssInjected = true;
+                    // run initialization only once
+                    if (window.simulatedHoverCssInjected) {
+                        return;
+                    }
 
-                $.each(document.styleSheets, function (i, stylesheet) {
-                    var replacementClassSelector = '.' + replacementClass;
+                    window.simulatedHoverCssInjected = true;
 
-                    $.each(stylesheet.cssRules, function (ruleIndex, rule) {
-                        // if the hover selector is present in the CSS rule, mirror it with the simulated hover class
-                        if (!checkForHover.exec(rule.cssText)) {
-                            return;
-                        }
+                    $.each(document.styleSheets, function (i, stylesheet) {
+                        var replacementClassSelector = '.' + replacementClass;
 
-                        var ruleText              = rule.cssText,
-                            parts                 = cssRuleStructure.exec(ruleText),
-                            selectorParts         = parts[1].split(','),
-                            declaration           = parts[2],
-                            modifiedSelectorParts = [],
-                            modifiedRuleText;
-
-                        // process the comma-separated parts of the original selector
-                        $.each(selectorParts, function (_, selectorPart) {
-                            // simply replace the hover pseudo-class with the custom class
-                            // NOTE: this does not handle potential occurrences inside [attr="xyz"] type selectors
-                            var modifiedSelectorPart = selectorPart.replace(allHoverSelectors, replacementClassSelector);
-
-                            // only use the parts that were affected by the replacement
-                            if (modifiedSelectorPart !== selectorPart) {
-                                modifiedSelectorParts.push(modifiedSelectorPart);
+                        $.each(stylesheet.cssRules, function (ruleIndex, rule) {
+                            // if the hover selector is present in the CSS rule, mirror it with the simulated hover class
+                            if (!checkForHover.exec(rule.cssText)) {
+                                return;
                             }
+
+                            var ruleText              = rule.cssText,
+                                parts                 = cssRuleStructure.exec(ruleText),
+                                selectorParts         = parts[1].split(','),
+                                declaration           = parts[2],
+                                modifiedSelectorParts = [],
+                                modifiedRuleText;
+
+                            // process the comma-separated parts of the original selector
+                            $.each(selectorParts, function (_, selectorPart) {
+                                // simply replace the hover pseudo-class with the custom class
+                                // NOTE: this does not handle potential occurrences inside [attr="xyz"] type selectors
+                                var modifiedSelectorPart = selectorPart.replace(allHoverSelectors, replacementClassSelector);
+
+                                // only use the parts that were affected by the replacement
+                                if (modifiedSelectorPart !== selectorPart) {
+                                    modifiedSelectorParts.push(modifiedSelectorPart);
+                                }
+                            });
+
+                            // add modified selectors as a new rule right after current one (to respect CSS cascade priority)
+                            // NOTE: directly changing original rule.cssText does not work
+                            modifiedRuleText = modifiedSelectorParts.join(',') + declaration;
+
+                            stylesheet.insertRule(modifiedRuleText, ruleIndex + 1);
                         });
-
-                        // add modified selectors as a new rule right after current one (to respect CSS cascade priority)
-                        // NOTE: directly changing original rule.cssText does not work
-                        modifiedRuleText = modifiedSelectorParts.join(',') + declaration;
-
-                        stylesheet.insertRule(modifiedRuleText, ruleIndex + 1);
                     });
-                });
 
-                $(document).on('mouseover', '*', function() {
-                    $(this).addClass(replacementClass);
-                });
+                    $(document).on('mouseover', '*', function() {
+                        $(this).addClass(replacementClass);
+                    });
 
-                $(document).on('mouseout', '*', function() {
-                    $(this).removeClass(replacementClass);
-                });
-            })(window, document, jQuery)
+                    $(document).on('mouseout', '*', function() {
+                        $(this).removeClass(replacementClass);
+                    });
+                })(window, document, jQuery)
 JS;
 
-        $this->getSession()->evaluateScript($setupJs);
+            $that->getSession()->evaluateScript($setupJs);
 
-        // perform the actual hover
-        $element = $this->findElementByXpath($xPath);
+            // perform the actual hover
+            $element = $that->findElementByXpath($xPath);
 
-        if ( ! $element) {
-            $message = 'Could not find the element by the given XPath: ' . $xPath;
+            if ( ! $element) {
+                $message = 'Could not find the element by the given XPath: ' . $xPath;
 
-            throw new \Exception($message);
-        }
+                throw new \Exception($message);
+            }
 
-        $element->mouseOver();
+            $element->mouseOver();
+        });
     }
 
     /**
@@ -1140,7 +1161,7 @@ JS;
      *
      * @return NodeElement|null
      */
-    private function findElementByXpath($xPath)
+    public function findElementByXpath($xPath)
     {
         return $this->getSession()->getPage()->find('xpath', $xPath);
     }
@@ -1242,7 +1263,7 @@ JS;
      *
      * @return string
      */
-    protected function fixStepArgument($argument)
+    public function fixStepArgument($argument)
     {
         return str_replace('\\"', '"', $argument);
     }
@@ -1299,33 +1320,22 @@ JS;
      */
     public function elementAtXPathShouldBeVisible($xPath)
     {
-        $this->elementAtXPathShouldExist($xPath);
+        $that = $this;
 
-        $element = $this->getRetrieveElementByXPathJavaScript($xPath);
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xPath, $that) {
+            $element = $that->findElementByXpath($xPath);
 
-        // Create a function to test visibilty
-        $isVisibleJavascript = <<<JS
-            function isVisible(element) {
-                var cs = window.getComputedStyle && window.getComputedStyle(element) ||
-                         this.browserBot && this.browserbot.getCurrentWindow().getComputedStyle(element);
-
-                return (cs.display !== "none" &&
-                    cs.visibility === "visible" &&
-                    parseInt(cs.height) > 0 &&
-                    parseInt(cs.width) > 0 &&
-                    parseFloat(cs.opacity) > 0);
+            if ( ! $element) {
+                throw new ElementNotFoundException($that->getSession(), 'element', 'xpath', $xPath);
             }
 
-            var targetElement = $element;
-
-            return isVisible(targetElement);
-JS;
-
-        // Return the result
-        $this->assertByJavaScript(
-            $isVisibleJavascript,
-            "The target element\'s CSS renders it hidden (when should be visible)."
-        );
+            if ( ! $element->isVisible()) {
+                throw new \Exception(sprintf(
+                    'The target element at XPath "%s" is hidden (while it should be visible)',
+                    $xPath
+                ));
+            }
+        });
     }
 
     /**
@@ -1337,33 +1347,22 @@ JS;
      */
     public function elementAtXPathShouldBeHidden($xPath)
     {
-        $this->elementAtXPathShouldExist($xPath);
+        $that = $this;
 
-        $element = $this->getRetrieveElementByXPathJavaScript($xPath);
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xPath, $that) {
+            $element = $that->findElementByXpath($xPath);
 
-        // Create a function to test visibilty
-        $isHiddenJavascript = <<<JS
-            function isVisible(element) {
-                var cs = window.getComputedStyle && window.getComputedStyle(element) ||
-                         this.browserBot && this.browserbot.getCurrentWindow().getComputedStyle(element);
-
-                return (cs.display !== "none" &&
-                    cs.visibility === "visible" &&
-                    parseInt(cs.height) > 0 &&
-                    parseInt(cs.width) > 0 &&
-                    parseFloat(cs.opacity) > 0);
+            if ( ! $element) {
+                throw new ElementNotFoundException($that->getSession(), 'element', 'xpath', $xPath);
             }
 
-            var targetElement = $element;
-
-            return !isVisible(targetElement);
-JS;
-
-        // Return the result
-        $this->assertByJavaScript(
-            $isHiddenJavascript,
-            "The target element's CSS renders it visible (when it should be hidden)."
-        );
+            if ($element->isVisible()) {
+                throw new \Exception(sprintf(
+                    'The target element at XPath "%s" is visible (while it should be hidden)',
+                    $xPath
+                ));
+            }
+        });
     }
 
     /**

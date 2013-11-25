@@ -378,7 +378,7 @@ JS;
      *
      * @throws \Exception
      */
-    protected function assertByJavaScript($javaScript, $failReason)
+    public function assertByJavaScript($javaScript, $failReason)
     {
         if ( ! $this->getSession()->evaluateScript($javaScript)) {
             $message = 'A JavaScript assertion has yielded false: ' . $failReason;

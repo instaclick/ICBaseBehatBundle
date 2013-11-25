@@ -635,15 +635,19 @@ JS;
     {
         $this->elementShouldExist($elementId);
 
-        $assertElementAttributeExistsJavaScript = <<<JS
-            var targetAttribute = document.getElementById('$elementId').hasAttribute('$elementAttributeName');
+        $that = $this;
 
-            return !! targetAttribute;
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($elementId, $elementAttributeName, $that) {
+            $assertElementAttributeExistsJavaScript = <<<JS
+                var targetAttribute = document.getElementById('$elementId').hasAttribute('$elementAttributeName');
+
+                return !! targetAttribute;
 JS;
-        $this->assertByJavaScript(
-            $assertElementAttributeExistsJavaScript,
-            'The target element\'s attribute "' . $elementAttributeName . '" does not exist (which should).'
-        );
+            $that->assertByJavaScript(
+                $assertElementAttributeExistsJavaScript,
+                'The target element\'s attribute "' . $elementAttributeName . '" does not exist (which should).'
+            );
+        });
     }
 
     /**
@@ -658,15 +662,19 @@ JS;
     {
         $this->elementShouldExist($elementId);
 
-        $assertElementAttributeExistsJavaScript = <<<JS
-            var targetAttribute = document.getElementById('$elementId').hasAttribute('$elementAttributeName');
+        $that = $this;
 
-            return ! targetAttribute;
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($elementId, $elementAttributeName, $that) {
+            $assertElementAttributeExistsJavaScript = <<<JS
+                var targetAttribute = document.getElementById('$elementId').hasAttribute('$elementAttributeName');
+
+                return ! targetAttribute;
 JS;
-        $this->assertByJavaScript(
-            $assertElementAttributeExistsJavaScript,
-            'The target element\'s attribute "' . $elementAttributeName . '" exists (which should not).'
-        );
+            $that->assertByJavaScript(
+                $assertElementAttributeExistsJavaScript,
+                'The target element\'s attribute "' . $elementAttributeName . '" exists (which should not).'
+            );
+        });
     }
 
     /**
@@ -681,17 +689,21 @@ JS;
     {
         $this->elementAtXPathShouldExist($xPath);
 
-        $retrieveElementJavaScript = $this->getRetrieveElementByXPathJavaScript($xPath);
+        $that = $this;
 
-        $assertElementAttributeExistsJavaScript = <<<JS
-            var targetAttribute = $retrieveElementJavaScript.hasAttribute('$elementAttributeName');
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xPath, $elementAttributeName, $that) {
+            $retrieveElementJavaScript = $that->getRetrieveElementByXPathJavaScript($xPath);
 
-            return !! targetAttribute;
+            $assertElementAttributeExistsJavaScript = <<<JS
+                var targetAttribute = $retrieveElementJavaScript.hasAttribute('$elementAttributeName');
+
+                return !! targetAttribute;
 JS;
-        $this->assertByJavaScript(
-            $assertElementAttributeExistsJavaScript,
-            'The target element\'s attribute "' . $elementAttributeName . '" does not exist (which should).'
-        );
+            $that->assertByJavaScript(
+                $assertElementAttributeExistsJavaScript,
+                'The target element\'s attribute "' . $elementAttributeName . '" does not exist (which should).'
+            );
+        });
     }
 
     /**
@@ -706,17 +718,21 @@ JS;
     {
         $this->elementAtXPathShouldExist($xPath);
 
-        $retrieveElementJavaScript = $this->getRetrieveElementByXPathJavaScript($xPath);
+        $that = $this;
 
-        $assertElementAttributeExistsJavaScript = <<<JS
-            var targetAttribute = $retrieveElementJavaScript.hasAttribute('$elementAttributeName');
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xPath, $elementAttributeName, $that) {
+            $retrieveElementJavaScript = $that->getRetrieveElementByXPathJavaScript($xPath);
 
-            return ! targetAttribute;
+            $assertElementAttributeExistsJavaScript = <<<JS
+                var targetAttribute = $retrieveElementJavaScript.hasAttribute('$elementAttributeName');
+
+                return ! targetAttribute;
 JS;
-        $this->assertByJavaScript(
-            $assertElementAttributeExistsJavaScript,
-            'The target element\'s attribute "' . $elementAttributeName . '" exists (which should not).'
-        );
+            $that->assertByJavaScript(
+                $assertElementAttributeExistsJavaScript,
+                'The target element\'s attribute "' . $elementAttributeName . '" exists (which should not).'
+            );
+        });
     }
 
     /**
@@ -732,17 +748,21 @@ JS;
     {
         $this->elementAttributeShouldExist($elementId, $elementAttributeName);
 
-        $retrieveElementAttributeValueJavaScript = <<<JS
-            return document.getElementById('$elementId').getAttribute('$elementAttributeName');
+        $that = $this;
+
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($elementId, $elementAttributeName, $that) {
+            $retrieveElementAttributeValueJavaScript = <<<JS
+                return document.getElementById('$elementId').getAttribute('$elementAttributeName');
 JS;
 
-        $retrievedAttribute = $this->getSession()->evaluateScript($retrieveElementAttributeValueJavaScript);
+            $retrievedAttribute = $that->getSession()->evaluateScript($retrieveElementAttributeValueJavaScript);
 
-        if ($retrievedAttribute != $elementAttributeTargetValue) {
-            $message = 'The target element attribute "' . $elementAttributeTargetValue . '" does not match the element attribute\'s actual value "'. $retrievedAttribute . '"';
+            if ($retrievedAttribute != $elementAttributeTargetValue) {
+                $message = 'The target element attribute "' . $elementAttributeTargetValue . '" does not match the element attribute\'s actual value "'. $retrievedAttribute . '"';
 
-            throw new \Exception($message);
-        }
+                throw new \Exception($message);
+            }
+        });
     }
 
     /**
@@ -756,11 +776,11 @@ JS;
      */
     public function elementAtXPathHasAttributeOfValue($xPath, $elementAttributeName, $elementAttributeTargetValue)
     {
+        $this->elementAtXPathAttributeShouldExist($xPath, $elementAttributeName);
+
         $that = $this;
 
         $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xPath, $elementAttributeName, $elementAttributeTargetValue, $that) {
-            $that->elementAtXPathAttributeShouldExist($xPath, $elementAttributeName);
-
             $retrieveElementJavaScript = $that->getRetrieveElementByXPathJavaScript($xPath);
 
             $retrieveElementAttributeValueJavaScript = <<<JS
@@ -790,19 +810,23 @@ JS;
     {
         $this->elementAtXPathAttributeShouldExist($xPath, $elementAttributeName);
 
-        $retrieveElementJavaScript = $this->getRetrieveElementByXPathJavaScript($xPath);
+        $that = $this;
 
-        $retrieveElementAttributeValueJavaScript = <<<JS
-            return $retrieveElementJavaScript.getAttribute('$elementAttributeName');
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xPath, $elementAttributeName, $elementAttributeTargetValue, $that) {
+            $retrieveElementJavaScript = $that->getRetrieveElementByXPathJavaScript($xPath);
+
+            $retrieveElementAttributeValueJavaScript = <<<JS
+                return $retrieveElementJavaScript.getAttribute('$elementAttributeName');
 JS;
 
-        $retrievedAttribute = $this->getSession()->evaluateScript($retrieveElementAttributeValueJavaScript);
+            $retrievedAttribute = $that->getSession()->evaluateScript($retrieveElementAttributeValueJavaScript);
 
-        if ($retrievedAttribute == $elementAttributeTargetValue) {
-            $message = 'The target element attribute "' . $elementAttributeTargetValue . '" does match the element attribute\'s actual value "'. $retrievedAttribute . '"';
+            if ($retrievedAttribute == $elementAttributeTargetValue) {
+                $message = 'The target element attribute "' . $elementAttributeTargetValue . '" does match the element attribute\'s actual value "'. $retrievedAttribute . '"';
 
-            throw new \Exception($message);
-        }
+                throw new \Exception($message);
+            }
+        });
     }
 
     /**
@@ -928,14 +952,18 @@ JS;
      */
     public function assertElementBeginsWith($xpath, $value)
     {
-        $webAssert = $this->assertSession();
-        $element   = $webAssert->elementExists('xpath', $xpath);
-        $actual    = $element->getHtml();
+        $that = $this;
 
-        if (strpos($actual, $value) !== 0) {
-            $message = sprintf('The string "%s" was not found in the HTML of the element matching xpath "%s".', $value, $xpath);
-            throw new \Exception($message);
-        }
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($xpath, $value, $that) {
+            $webAssert = $that->assertSession();
+            $element   = $webAssert->elementExists('xpath', $xpath);
+            $actual    = $element->getHtml();
+
+            if (strpos($actual, $value) !== 0) {
+                $message = sprintf('The string "%s" was not found in the HTML of the element matching xpath "%s".', $value, $xpath);
+                throw new \Exception($message);
+            }
+        });
     }
 
     /**
@@ -960,7 +988,7 @@ JS;
 
             $element->click();
 
-            usleep(1000);
+            usleep(1000000);
         });
 
     }

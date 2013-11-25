@@ -31,7 +31,7 @@ class SpinCommandContext extends RawMinkContext
                 return;
             } catch (\Exception $exception) {
                 if ($iterations < $attemptThreshold) {
-                    usleep($interval * 1000);
+                    usleep($interval * 1000000);
 
                     continue;
                 }

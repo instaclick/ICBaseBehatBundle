@@ -750,7 +750,7 @@ JS;
 
         $that = $this;
 
-        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($elementId, $elementAttributeName, $that) {
+        $this->getMainContext()->getSubContext('SpinCommandContext')->spin(function () use ($elementId, $elementAttributeName, $elementAttributeTargetValue, $that) {
             $retrieveElementAttributeValueJavaScript = <<<JS
                 return document.getElementById('$elementId').getAttribute('$elementAttributeName');
 JS;

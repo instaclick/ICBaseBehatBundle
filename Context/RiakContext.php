@@ -55,7 +55,7 @@ class RiakContext extends RawMinkContext implements KernelAwareInterface
     }
 
     /**
-     * Clear a riack bucket for a given service id
+     * Clear a riak bucket for a given service id
      *
      * @param string $serviceId
      */

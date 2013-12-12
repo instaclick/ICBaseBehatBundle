@@ -88,11 +88,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function selectOption($select, $option)
     {
-        // TODO: decouple
-        if ($select === 'Gender') {
-            $option = $this->getSubcontext('SelectContext')->getOptionValue($option);
-        }
-
         $this->getSession()->getSelectorsHandler()->getSelector('named')->registerNamedXpath(
             'select',
             ".//select[(((./@id = %locator% or ./@name = %locator%) or ./@id = //label[contains(normalize-space(string(.)), %locator%)]/@for) or ./@placeholder = %locator%)] | .//label[contains(normalize-space(string(.)), %locator%)]//.//select | .//div/label[contains(text(), %locator%)]/../select"

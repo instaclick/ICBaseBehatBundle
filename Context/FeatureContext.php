@@ -5,12 +5,8 @@
 
 namespace IC\Bundle\Base\BehatBundle\Context;
 
-use Behat\Behat\Event\BaseScenarioEvent;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Driver\Selenium2Driver;
-use Behat\Symfony2Extension\Context\KernelAwareInterface;
-use Guzzle\Http\Client;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 //
 // Require 3rd-party libraries here:
@@ -27,21 +23,8 @@ require_once 'PHPUnit/Framework/Assert/Functions.php';
  * @author Yuan Xie <shayx@nationalfibre.net>
  * @author Anthon Pang <anthonp@nationalfibre.net>
  */
-class FeatureContext extends MinkContext implements KernelAwareInterface
+class FeatureContext extends MinkContext
 {
-    /**
-     * @var KernelInterface Kernel
-     */
-    private $kernel;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setKernel(KernelInterface $kernel)
-    {
-        $this->kernel = $kernel;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -159,26 +142,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         if ($driver instanceof Selenium2Driver) {
             $this->getSession()->getDriver()->getWebDriverSession()->window('current')->postSize(array('width' => 1280, 'height' => 1024));
         }
-    }
-
-    /**
-     * Use BeforeScenario hook to automatically clear APC cache for increased test isolation
-     *
-     * @param \Behat\Behat\Event\BaseScenarioEvent $event Event (unused)
-     *
-     * @BeforeScenario
-     */
-    public function prepareApcCache(BaseScenarioEvent $event = null)
-    {
-        $router = $this->kernel
-                       ->getContainer()
-                       ->get('router');
-
-        $url = rtrim($this->getMinkParameter('base_url'), '/')
-             . $router->generate('ICBaseBehatBundle_Page_Apc_Delete');
-
-        $client = new Client;
-        $client->post($url)->send();
     }
 
     /**

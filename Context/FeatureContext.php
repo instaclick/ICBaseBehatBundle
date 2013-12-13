@@ -162,14 +162,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function locatePath($path)
-    {
-        return parent::locatePath($path);
-    }
-
-    /**
      * Use BeforeScenario hook to automatically clear APC cache for increased test isolation
      *
      * @param \Behat\Behat\Event\BaseScenarioEvent $event Event (unused)

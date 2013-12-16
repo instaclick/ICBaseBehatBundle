@@ -133,9 +133,6 @@ class FeatureContext extends MinkContext
      */
     public function visit($page)
     {
-        // TODO: decouple
-        $page = $this->getSubcontext('CredentialContext')->getPageWithPropertySubstituded($page);
-
         parent::visit($page);
 
         // maximize current browser window if it uses Selenium2Driver

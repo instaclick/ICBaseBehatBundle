@@ -25,14 +25,16 @@ class SpinCommandContext extends RawMinkContext
      *
      * @param closure $lambda           Callback.
      * @param integer $attemptThreshold Number of attempts to execute the command.
+     *
+     * @throws \Exception If attemptThreshold is met
+     *
+     * @return mixed
      */
     public function spin($lambda, $attemptThreshold = 15)
     {
         for ($iteration = 1; $iteration <= $attemptThreshold; $iteration++) {
             try {
-                call_user_func($lambda);
-
-                return;
+                return call_user_func($lambda);
             } catch (\Exception $exception) {
                 if ($iteration < $attemptThreshold) {
                     usleep($this->getNextDelay($iteration, $attemptThreshold));

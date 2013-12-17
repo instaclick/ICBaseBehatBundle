@@ -26,6 +26,7 @@ require_once 'PHPUnit/Framework/Assert/Functions.php';
  *
  * @author Yuan Xie <shayx@nationalfibre.net>
  * @author Anthon Pang <anthonp@nationalfibre.net>
+ * @author Mark Kasaboski <markk@nationalfibre.net>
  */
 class FeatureContext extends MinkContext implements KernelAwareInterface
 {
@@ -98,15 +99,26 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             ".//select[(((./@id = %locator% or ./@name = %locator%) or ./@id = //label[contains(normalize-space(string(.)), %locator%)]/@for) or ./@placeholder = %locator%)] | .//label[contains(normalize-space(string(.)), %locator%)]//.//select | .//div/label[contains(text(), %locator%)]/../select"
         );
 
-        parent::selectOption($select, $option);
+        $select = $this->fixStepArgument($select);
+        $option = $this->fixStepArgument($option);
+        $that   = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($select, $option, $that) {
+            $that->getSession()->getPage()->selectFieldOption($select, $option);
+        });
     }
 
     /**
      * {@inheritdoc}
      */
-    public function additionallySelectOption($select, $option)
+    public function clickLink($link)
     {
-        $this->selectOption($select, $option);
+        $link = $this->fixStepArgument($link);
+        $that = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($link, $that) {
+            $that->getSession()->getPage()->clickLink($link);
+        });
     }
 
     /**
@@ -119,7 +131,11 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             ".//*[self::input | self::textarea | self::select][not(./@type = 'submit' or ./@type = 'image' or ./@type = 'hidden')][(((./@id = %locator% or ./@name = %locator%) or ./@id = //label[contains(normalize-space(string(.)), %locator%)]/@for) or ./@placeholder = %locator%)] | .//label[contains(normalize-space(string(.)), %locator%)]//.//*[self::input | self::textarea | self::select][not(./@type = 'submit' or ./@type = 'image' or ./@type = 'hidden')] | .//label[contains(normalize-space(string(.)), %locator%)]/../div/div/*[self::input | self::textarea | self::select][not(./@type = 'submit' or ./@type = 'image' or ./@type = 'hidden')]"
         );
 
-        parent::assertFieldContains($field, $value);
+        $that = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($field, $value, $that) {
+            $that->assertSession()->fieldValueEquals($field, $value);
+        });
     }
 
     /**
@@ -133,7 +149,12 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             ".//input[./@type = 'checkbox'][(((./@id = %locator% or ./@name = %locator%) or ./@id = //label[contains(normalize-space(string(.)), %locator%)]/@for) or ./@placeholder = %locator%)] | .//label[contains(normalize-space(string(.)), %locator%)]//.//input[./@type = 'checkbox'] | .//div/label[contains(normalize-space(string(.)), %locator%)]/../input[./@type = 'checkbox'] | .//span/label[contains(normalize-space(string(.)), %locator%)]/../input[./@type = 'checkbox']"
         );
 
-        parent::assertCheckboxChecked($checkbox);
+        $checkbox = $this->fixStepArgument($checkbox);
+        $that     = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($checkbox, $that) {
+            $that->assertSession()->checkboxChecked($checkbox);
+        });
     }
 
     /**
@@ -147,7 +168,12 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             ".//input[./@type = 'checkbox'][(((./@id = %locator% or ./@name = %locator%) or ./@id = //label[contains(normalize-space(string(.)), %locator%)]/@for) or ./@placeholder = %locator%)] | .//label[contains(normalize-space(string(.)), %locator%)]//.//input[./@type = 'checkbox'] | .//div/label[contains(normalize-space(string(.)), %locator%)]/../input[./@type = 'checkbox'] | .//span/label[contains(normalize-space(string(.)), %locator%)]/../input[./@type = 'checkbox']"
         );
 
-        parent::assertCheckboxNotChecked($checkbox);
+        $checkbox = $this->fixStepArgument($checkbox);
+        $that     = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($checkbox, $that) {
+            $that->assertSession()->checkboxNotChecked($checkbox);
+        });
     }
 
     /**
@@ -164,14 +190,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         if ($driver instanceof Selenium2Driver) {
             $this->getSession()->getDriver()->getWebDriverSession()->window('current')->postSize(array('width' => 1280, 'height' => 1024));
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function locatePath($path)
-    {
-        return parent::locatePath($path);
     }
 
     /**
@@ -195,18 +213,243 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     * Checks, that page contains text matching specified pattern.
-     *
-     * @param string $pattern the pattern needs to be matched for the text on the page
-     *
-     * @Then /^(?:|I )should see the text matching (?P<pattern>"(?:[^"]|\\")*")$/
+     * {@inheritdoc}
      */
-    public function pageMatchesText($pattern)
+    public function assertPageAddress($page)
     {
         $that = $this;
 
-        $this->getMainContext()->getSubcontext('SpinCommandContext')->spin(function () use ($pattern, $that) {
-            $that->assertPageMatchesText($pattern);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($page, $that) {
+            $that->assertSession()->addressEquals($that->locatePath($page));
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertHomepage()
+    {
+        $that = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($that) {
+            $that->assertSession()->addressEquals($that->locatePath('/'));
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertUrlRegExp($pattern)
+    {
+        $pattern = $this->fixStepArgument($pattern);
+        $that    = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($pattern, $that) {
+            $that->assertSession()->addressMatches($pattern);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertResponseStatus($code)
+    {
+        $that = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($code, $that) {
+            $that->assertSession()->statusCodeEquals($code);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertResponseStatusIsNot($code)
+    {
+        $that = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($code, $that) {
+            $that->assertSession()->statusCodeNotEquals($code);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertPageContainsText($text)
+    {
+        $text = $this->fixStepArgument($text);
+        $that = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($text, $that) {
+            $that->assertSession()->pageTextContains($text);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertPageNotContainsText($text)
+    {
+        $text = $this->fixStepArgument($text);
+        $that = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($text, $that) {
+            $that->assertSession()->pageTextNotContains($text);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertPageMatchesText($pattern)
+    {
+        $pattern = $this->fixStepArgument($pattern);
+        $that    = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($pattern, $that) {
+            $that->assertSession()->pageTextMatches($pattern);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertPageNotMatchesText($pattern)
+    {
+        $pattern = $this->fixStepArgument($pattern);
+        $that    = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($pattern, $that) {
+            $that->assertSession()->pageTextNotMatches($pattern);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertResponseContains($text)
+    {
+        $text = $this->fixStepArgument($text);
+        $that = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($text, $that) {
+            $that->assertSession()->responseContains($text);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertResponseNotContains($text)
+    {
+        $text = $this->fixStepArgument($text);
+        $that = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($text, $that) {
+            $that->assertSession()->responseNotContains($text);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertElementContainsText($element, $text)
+    {
+        $text = $this->fixStepArgument($text);
+        $that = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($element, $text, $that) {
+            $that->assertSession()->elementTextContains('css', $element, $text);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertElementNotContainsText($element, $text)
+    {
+        $text = $this->fixStepArgument($text);
+        $that = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($element, $text, $that) {
+            $that->assertSession()->elementTextNotContains('css', $element, $text);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertElementContains($element, $value)
+    {
+        $value = $this->fixStepArgument($value);
+        $that  = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($element, $value, $that) {
+            $that->assertSession()->elementContains('css', $element, $value);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertElementNotContains($element, $value)
+    {
+        $value = $this->fixStepArgument($value);
+        $that  = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($element, $value, $that) {
+            $that->assertSession()->elementNotContains('css', $element, $value);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertElementOnPage($element)
+    {
+        $that = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($element, $that) {
+            $that->assertSession()->elementExists('css', $element);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertElementNotOnPage($element)
+    {
+        $that = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($element, $that) {
+            $that->assertSession()->elementNotExists('css', $element);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertFieldNotContains($field, $value)
+    {
+        $field = $this->fixStepArgument($field);
+        $value = $this->fixStepArgument($value);
+        $that  = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($field, $value, $that) {
+            $that->assertSession()->fieldValueNotEquals($field, $value);
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertNumElements($num, $element)
+    {
+        $that = $this;
+
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($num, $element, $that) {
+            $that->assertSession()->elementsCount('css', $element, intval($num));
         });
     }
 }

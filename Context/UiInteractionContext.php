@@ -987,10 +987,7 @@ JS;
             }
 
             $element->click();
-
-            usleep(1000000);
         });
-
     }
 
     /**

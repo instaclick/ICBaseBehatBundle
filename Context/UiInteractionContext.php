@@ -885,19 +885,23 @@ JS;
     {
         $this->elementAtXPathAttributeShouldExist($xPath, $elementAttributeName);
 
-        $retrieveElementJavaScript = $this->getRetrieveElementByXPathJavaScript($xPath);
+        $that = $this;
 
-        $retrieveElementAttributeValueJavaScript = <<<JS
-            return $retrieveElementJavaScript.getAttribute('$elementAttributeName');
+        $this->getMainContext()->getSubcontext('SpinCommandContext')->spin(function () use ($xPath, $elementAttributeName, $elementAttributeTargetSubstring, $that) {
+            $retrieveElementJavaScript = $that->getRetrieveElementByXPathJavaScript($xPath);
+
+            $retrieveElementAttributeValueJavaScript = <<<JS
+                return $retrieveElementJavaScript.getAttribute('$elementAttributeName');
 JS;
 
-        $retrievedAttribute = $this->getSession()->evaluateScript($retrieveElementAttributeValueJavaScript);
+            $retrievedAttribute = $that->getSession()->evaluateScript($retrieveElementAttributeValueJavaScript);
 
-        if (false === stristr($retrievedAttribute, $elementAttributeTargetSubstring)) {
-            $message = 'The target element attribute "' . $elementAttributeTargetSubstring . '" does not appear in the element attribute\'s actual value "'. $retrievedAttribute . '"';
+            if (false === stristr($retrievedAttribute, $elementAttributeTargetSubstring)) {
+                $message = 'The target element attribute "' . $elementAttributeTargetSubstring . '" does not appear in the element attribute\'s actual value "'. $retrievedAttribute . '"';
 
-            throw new \Exception($message);
-        }
+                throw new \Exception($message);
+            }
+        });
     }
 
     /**
@@ -988,10 +992,7 @@ JS;
             }
 
             $element->click();
-
-            usleep(1000000);
         });
-
     }
 
     /**

@@ -8,6 +8,9 @@ namespace IC\Bundle\Base\BehatBundle\Context;
 use Behat\Behat\Event\BaseScenarioEvent;
 use Behat\Mink\Driver\Selenium2Driver;
 use Behat\MinkExtension\Context\MinkContext;
+use Behat\Symfony2Extension\Context\KernelAwareInterface;
+use Guzzle\Http\Client;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 //
 // Require 3rd-party libraries here:
@@ -25,8 +28,21 @@ require_once 'PHPUnit/Framework/Assert/Functions.php';
  * @author Anthon Pang <anthonp@nationalfibre.net>
  * @author Mark Kasaboski <markk@nationalfibre.net>
  */
-class FeatureContext extends MinkContext
+class FeatureContext extends MinkContext implements KernelAwareInterface
 {
+    /**
+     * @var KernelInterface Kernel
+     */
+    private $kernel;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setKernel(KernelInterface $kernel)
+    {
+        $this->kernel = $kernel;
+    }
+
     /**
      * {@inheritdoc}
      */

@@ -5,8 +5,9 @@
 
 namespace IC\Bundle\Base\BehatBundle\Context;
 
-use Behat\MinkExtension\Context\MinkContext;
+use Behat\Behat\Event\BaseScenarioEvent;
 use Behat\Mink\Driver\Selenium2Driver;
+use Behat\MinkExtension\Context\MinkContext;
 
 //
 // Require 3rd-party libraries here:
@@ -167,26 +168,6 @@ class FeatureContext extends MinkContext
         if ($driver instanceof Selenium2Driver) {
             $this->getSession()->getDriver()->getWebDriverSession()->window('current')->postSize(array('width' => 1280, 'height' => 1024));
         }
-    }
-
-    /**
-     * Use BeforeScenario hook to automatically clear APC cache for increased test isolation
-     *
-     * @param \Behat\Behat\Event\BaseScenarioEvent $event Event (unused)
-     *
-     * @BeforeScenario
-     */
-    public function prepareApcCache(BaseScenarioEvent $event = null)
-    {
-        $router = $this->kernel
-                       ->getContainer()
-                       ->get('router');
-
-        $url = rtrim($this->getMinkParameter('base_url'), '/')
-             . $router->generate('ICBaseBehatBundle_Page_Apc_Delete');
-
-        $client = new Client;
-        $client->post($url)->send();
     }
 
     /**

@@ -5,11 +5,12 @@
 
 namespace IC\Bundle\Base\BehatBundle\Context;
 
-use Behat\MinkExtension\Context\RawMinkContext;
+use Behat\Behat\Context\Step;
 use Behat\Gherkin\Node\PyStringNode;
-use Behat\Mink\Exception\ElementNotFoundException;
-use Behat\Symfony2Extension\Context\KernelAwareInterface;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Mink\Exception\ElementNotFoundException;
+use Behat\MinkExtension\Context\RawMinkContext;
+use Behat\Symfony2Extension\Context\KernelAwareInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 //
@@ -1571,7 +1572,6 @@ JS;
         assertEquals($actualValue, date('Y-m-01'));
     }
 
-
     /**
      * Assert Current Date
      *
@@ -1585,5 +1585,130 @@ JS;
 
         $actualValue = $this->retrieveElementUsingJquery($selector);
         assertEquals($actualValue, date('Y-m-d'));
+    }
+
+    /**
+     * Assert the elements with specified XPath in the table contain specified texts.
+     *
+     * Example:
+     *     Then I should see the following texts in the elements at XPath:
+     *         | text | xpath |
+     *
+     * @param \Behat\Gherkin\Node\TableNode $table
+     *
+     * @return array
+     *
+     * @Then /^(?:|I )should see the following texts in the elements at XPath:$/
+     */
+    public function assertElementByXPathContainsTextInTable($table)
+    {
+        $steps = array();
+        $rows = $table->getHash();
+
+        foreach ($rows as $row) {
+            $steps[] = new Step\Then('I should see "' . $row['text'] . '" in the element at XPath "' . $row['xpath'] . '"');
+        }
+
+        return $steps;
+    }
+
+    /**
+     * Assert the page contains specified texts in the table.
+     *
+     * Example:
+     *     Then I should see the following texts:
+     *         | text |
+     *
+     * @param \Behat\Gherkin\Node\TableNode $table
+     *
+     * @return array
+     *
+     * @Then /^(?:|I )should see the following texts:$/
+     */
+    public function assertPageContainsTextInTable($table)
+    {
+        $steps = array();
+        $rows = $table->getHash();
+
+        foreach ($rows as $row) {
+            $steps[] = new Step\Then('I should see "' . $row['text'] . '"');
+        }
+
+        return $steps;
+    }
+
+    /**
+     * Assert the page contains elements with specified XPath in the table.
+     *
+     * Example:
+     *     Then I should see elements at the following XPath:
+     *         | xpath |
+     *
+     * @param \Behat\Gherkin\Node\TableNode $table
+     *
+     * @return array
+     *
+     * @Then /^(?:|I )should see elements at the following XPath:$/
+     */
+    public function assertElementAtXPathInTable($table)
+    {
+        $steps = array();
+        $rows = $table->getHash();
+
+        foreach ($rows as $row) {
+            $steps[] = new Step\Then('I should see an element at XPath "' . $row['xpath'] . '"');
+        }
+
+        return $steps;
+    }
+
+    /**
+     * Assert the elements with specified CSS in the table contain specified texts.
+     *
+     * Example:
+     *     Then I should see the following texts in the elements by CSS:
+     *         | text | css |
+     *
+     * @param \Behat\Gherkin\Node\TableNode $table
+     *
+     * @return array
+     *
+     * @Then /^(?:|I )should see the following texts in the elements by CSS:$/
+     */
+    public function assertElementByCSSContainsTextInTable($table)
+    {
+        $steps = array();
+        $rows = $table->getHash();
+
+        foreach ($rows as $row) {
+            $steps[] = new Step\Then('I should see "' . $row['text'] . '" in the "' . $row['css'] . '" element');
+        }
+
+        return $steps;
+    }
+
+    /**
+     * Assert the page contains elements with specified CSS in the table.
+     *
+     * Example:
+     *     Then I should see the following elements by CSS:
+     *         | css |
+     *
+     * @param \Behat\Gherkin\Node\TableNode $table
+     *
+     * @return array
+     *
+     * @Then /^(?:|I )should see the following elements by CSS:$/
+     */
+    public function assertElementAtCSSInTable($table)
+    {
+        $steps = array();
+        $rows = $table->getHash();
+
+        foreach ($rows as $row) {
+            $steps[] = new Step\Then('I should see a "' . $row['css'] . '" element');
+        }
+
+        return $steps;
     }
 }

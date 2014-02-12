@@ -1711,4 +1711,18 @@ JS;
 
         return $steps;
     }
+
+    /**
+     * TODO: Temporary solution, Jqgrid not displaying all columns needs to be discussed.
+     *
+     * @Given /^(?:|I )make report unusable to be able to see all column headers$/
+     */
+    public function makeReportUnusableToBeAbleToSeeAllColumnHeaders()
+    {
+        $javascript = <<<JS
+            $('thead th').css('display', 'inline');
+JS;
+
+        $this->getSession()->executeScript($javascript);
+    }
 }

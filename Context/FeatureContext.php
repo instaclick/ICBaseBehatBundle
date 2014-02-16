@@ -48,7 +48,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function fillField($field, $value)
     {
-        $this->getSession()->getSelectorsHandler()->getSelector('named')->registerNamedXpath(
+        $this->getSession()->getSelectorsHandler()->getSelector('named_partial')->registerNamedXpath(
             'field',
             ".//*[self::input | self::textarea | self::select][not(./@type = 'submit' or ./@type = 'image' or ./@type = 'hidden')][(((./@id = %locator% or ./@name = %locator%) or ./@id = //label[contains(normalize-space(string(.)), %locator%)]/@for) or ./@placeholder = %locator%)] | .//label[contains(normalize-space(string(.)), %locator%)]//.//*[self::input | self::textarea | self::select][not(./@type = 'submit' or ./@type = 'image' or ./@type = 'hidden')] | .//label[contains(normalize-space(string(.)), %locator%)]/../div/div/*[self::input | self::textarea | self::select][not(./@type = 'submit' or ./@type = 'image' or ./@type = 'hidden')]"
         );
@@ -62,7 +62,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function checkOption($option)
     {
         // override selector to handle twitter-bootstrap style checkbox+label layout (and <span> variant)
-        $this->getSession()->getSelectorsHandler()->getSelector('named')->registerNamedXpath(
+        $this->getSession()->getSelectorsHandler()->getSelector('named_partial')->registerNamedXpath(
             'checkbox',
             ".//input[./@type = 'checkbox'][(((./@id = %locator% or ./@name = %locator%) or ./@id = //label[contains(normalize-space(string(.)), %locator%)]/@for) or ./@placeholder = %locator%)] | .//label[contains(normalize-space(string(.)), %locator%)]//.//input[./@type = 'checkbox'] | .//div/label[contains(normalize-space(string(.)), %locator%)]/../input[./@type = 'checkbox'] | .//span/label[contains(normalize-space(string(.)), %locator%)]/../input[./@type = 'checkbox']"
         );
@@ -76,7 +76,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function uncheckOption($option)
     {
         // override selector to handle twitter-bootstrap style checkbox+label layout (and <span> variant)
-        $this->getSession()->getSelectorsHandler()->getSelector('named')->registerNamedXpath(
+        $this->getSession()->getSelectorsHandler()->getSelector('named_partial')->registerNamedXpath(
             'checkbox',
             ".//input[./@type = 'checkbox'][(((./@id = %locator% or ./@name = %locator%) or ./@id = //label[contains(normalize-space(string(.)), %locator%)]/@for) or ./@placeholder = %locator%)] | .//label[contains(normalize-space(string(.)), %locator%)]//.//input[./@type = 'checkbox'] | .//div/label[contains(normalize-space(string(.)), %locator%)]/../input[./@type = 'checkbox'] | .//span/label[contains(normalize-space(string(.)), %locator%)]/../input[./@type = 'checkbox']"
         );
@@ -89,7 +89,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function selectOption($select, $option)
     {
-        $this->getSession()->getSelectorsHandler()->getSelector('named')->registerNamedXpath(
+        $this->getSession()->getSelectorsHandler()->getSelector('named_partial')->registerNamedXpath(
             'select',
             ".//select[(((./@id = %locator% or ./@name = %locator%) or ./@id = //label[contains(normalize-space(string(.)), %locator%)]/@for) or ./@placeholder = %locator%)] | .//label[contains(normalize-space(string(.)), %locator%)]//.//select | .//div/label[contains(text(), %locator%)]/../select"
         );
@@ -121,7 +121,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function assertFieldContains($field, $value)
     {
-        $this->getSession()->getSelectorsHandler()->getSelector('named')->registerNamedXpath(
+        $this->getSession()->getSelectorsHandler()->getSelector('named_partial')->registerNamedXpath(
             'field',
             ".//*[self::input | self::textarea | self::select][not(./@type = 'submit' or ./@type = 'image' or ./@type = 'hidden')][(((./@id = %locator% or ./@name = %locator%) or ./@id = //label[contains(normalize-space(string(.)), %locator%)]/@for) or ./@placeholder = %locator%)] | .//label[contains(normalize-space(string(.)), %locator%)]//.//*[self::input | self::textarea | self::select][not(./@type = 'submit' or ./@type = 'image' or ./@type = 'hidden')] | .//label[contains(normalize-space(string(.)), %locator%)]/../div/div/*[self::input | self::textarea | self::select][not(./@type = 'submit' or ./@type = 'image' or ./@type = 'hidden')]"
         );
@@ -139,7 +139,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function assertCheckboxChecked($checkbox)
     {
         // override selector to handle twitter-bootstrap style checkbox+label layout (and <span> variant)
-        $this->getSession()->getSelectorsHandler()->getSelector('named')->registerNamedXpath(
+        $this->getSession()->getSelectorsHandler()->getSelector('named_partial')->registerNamedXpath(
             'checkbox',
             ".//input[./@type = 'checkbox'][(((./@id = %locator% or ./@name = %locator%) or ./@id = //label[contains(normalize-space(string(.)), %locator%)]/@for) or ./@placeholder = %locator%)] | .//label[contains(normalize-space(string(.)), %locator%)]//.//input[./@type = 'checkbox'] | .//div/label[contains(normalize-space(string(.)), %locator%)]/../input[./@type = 'checkbox'] | .//span/label[contains(normalize-space(string(.)), %locator%)]/../input[./@type = 'checkbox']"
         );
@@ -158,7 +158,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function assertCheckboxNotChecked($checkbox)
     {
         // override selector to handle twitter-bootstrap style checkbox+label layout (and <span> variant)
-        $this->getSession()->getSelectorsHandler()->getSelector('named')->registerNamedXpath(
+        $this->getSession()->getSelectorsHandler()->getSelector('named_partial')->registerNamedXpath(
             'checkbox',
             ".//input[./@type = 'checkbox'][(((./@id = %locator% or ./@name = %locator%) or ./@id = //label[contains(normalize-space(string(.)), %locator%)]/@for) or ./@placeholder = %locator%)] | .//label[contains(normalize-space(string(.)), %locator%)]//.//input[./@type = 'checkbox'] | .//div/label[contains(normalize-space(string(.)), %locator%)]/../input[./@type = 'checkbox'] | .//span/label[contains(normalize-space(string(.)), %locator%)]/../input[./@type = 'checkbox']"
         );

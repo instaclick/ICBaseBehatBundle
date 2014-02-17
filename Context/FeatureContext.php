@@ -444,4 +444,89 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             $that->assertSession()->elementsCount('css', $element, intval($num));
         });
     }
+
+    /**
+     * Assert an option has been selected
+     *
+     * @param string $option      Label of the option to assert
+     * @param string $selectXpath XPath of the selector
+     *
+     * @Then /^(?:|I )should see "(?P<option>(?:[^"]|\\")*)" is selected as selector at XPath "(?P<selectXpath>[^"]*)"$/
+     */
+    public function assertSelected($option, $selectXpath)
+    {
+        $option = $this->fixStepArgument($option);
+        $select = $this->findElementByXpath($selectXpath);
+
+        if (null === $select) {
+            $message = 'Could not find the selector by the given XPath: ' . $selectXpath;
+
+            throw new \Exception($message);
+        }
+
+        $opt = $this->getSession()->getPage()->find('named', array(
+            'option', $this->getSession()->getSelectorsHandler()->xpathLiteral($option)
+                ));
+
+        if (null === $opt) {
+            throw new ElementNotFoundException(
+                $this->getSession(),
+                'select option',
+                'value|text',
+                $option
+            );
+        }
+        $expectedValue = $opt->getValue();
+
+        assertEquals($expectedValue, $this->getSession()->getDriver()->getValue($selectXpath));
+    }
+
+    /**
+     * Assert an option has not been selected
+     *
+     * @param string $option      Label of the option to assert
+     * @param string $selectXpath XPath of the selector
+     *
+     * @Then /^(?:|I )should not see "(?P<option>(?:[^"]|\\")*)" is selected as selector at XPath "(?P<selectXpath>[^"]*)"$/
+     */
+    public function assertNotSelected($option, $selectXpath)
+    {
+        $option = $this->fixStepArgument($option);
+        $select = $this->findElementByXpath($selectXpath);
+
+        if (null === $select) {
+            $message = 'Could not find the selector by the given XPath: ' . $selectXpath;
+
+            throw new \Exception($message);
+        }
+
+        $opt = $this->getSession()->getPage()->find('named', array(
+            'option', $this->getSession()->getSelectorsHandler()->xpathLiteral($option)
+                ));
+        assertTrue((null === $opt) or ($opt->getValue() !== $this->getSession()->getDriver()->getValue($selectXpath)));
+    }
+
+    /**
+     * Finds element with specified XPath.
+     *
+     * @param string $xPath XPath
+     *
+     * @return NodeElement|null
+     */
+    private function findElementByXpath($xPath)
+    {
+        return $this->getSession()->getPage()->find('xpath', $xPath);
+    }
+
+    /**
+     * Returns fixed step argument (with \\" replaced back to ").
+     *
+     * @param string $argument
+     *
+     * @return string
+     */
+    protected function fixStepArgument($argument)
+    {
+        return str_replace('\\"', '"', $argument);
+    }
 }

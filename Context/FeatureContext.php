@@ -529,4 +529,26 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     {
         return str_replace('\\"', '"', $argument);
     }
+
+    /**
+     * Selects option in select field with specified XPath.
+     *
+     * @param string $option      Label of the option to select
+     * @param string $selectXpath XPath of the selector
+     *
+     * @When /^(?:|I )select "(?P<option>(?:[^"]|\\")*)" from selector at XPath "(?P<selectXpath>[^"]*)"$/
+     */
+    public function selectOptionFromSelectorAtXPath($option, $selectXpath)
+    {
+        $option = $this->fixStepArgument($option);
+        $select = $this->findElementByXpath($selectXpath);
+
+        if (null === $select) {
+            $message = 'Could not find the selector by the given XPath: ' . $selectXpath;
+
+            throw new \Exception($message);
+        }
+
+        $select->selectOption($option, false);
+    }
 }

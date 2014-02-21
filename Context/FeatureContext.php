@@ -7,6 +7,7 @@ namespace IC\Bundle\Base\BehatBundle\Context;
 
 use Behat\Behat\Event\BaseScenarioEvent;
 use Behat\Mink\Driver\Selenium2Driver;
+use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelAwareInterface;
 use Guzzle\Http\Client;

@@ -18,33 +18,33 @@ class AliasContext extends RawMinkContext
     /**
      * @var array
      */
-    private $valueList = array();
+    private $map = array();
 
     /**
-     * Map alias to value.
+     * Constructor
      *
-     * @param mixed $alias
+     * @param string $filename
+     */
+    public function __construct($filename)
+    {
+        $this->map = Yaml::parse(file_get_contents($filename));
+    }
+
+    /**
+     * Map key to value
+     *
+     * @param mixed $key
      *
      * @return mixed
      *
      * @Transform /^((?:[^"]|\\")+)$/
      */
-    public function mapAliasToValue($alias)
+    public function mapKeyToValue($key)
     {
-        if (is_scalar($alias) && isset($this->valueList[$alias])) {
-            return $this->valueList[$alias];
+        if (is_scalar($key) && isset($this->map[$key])) {
+            return $this->map[$key];
         }
 
-        return $alias;
-    }
-
-    /**
-     * Parse a YAML file and merge to current list of aliases.
-     *
-     * @param string $filePath
-     */
-    public function parseYaml($filePath)
-    {
-        $this->valueList = array_merge($this->valueList, Yaml::parse(file_get_contents($filePath)));
+        return $key;
     }
 }

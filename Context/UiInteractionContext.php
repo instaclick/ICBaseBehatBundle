@@ -1247,47 +1247,6 @@ JS;
     }
 
     /**
-     * Adjust Jcrop selection box to certain coordinates
-     *
-     * @param string  $targetImageId Target Image Id
-     * @param integer $positionLeft  Position of left side
-     * @param integer $positionTop   Position of top side
-     * @param integer $sideLength    Length of a side
-     *
-     * @Then /^(?:|I )adjust the selection square on image "([^"]*)" to X "(\d+)", Y "(\d+)" and side length "(\d+)"$/
-     */
-    public function adjustJcropSelectionBox($targetImageId, $positionLeft, $positionTop, $sideLength)
-    {
-        $positionRight  = $positionLeft + $sideLength;
-        $positionBottom = $positionTop + $sideLength;
-
-        $adjustJcropSelectionBoxJavaScript = <<<JS
-            $('#$targetImageId').data('Jcrop').setSelect([$positionLeft, $positionTop, $positionRight, $positionBottom]);
-JS;
-        $this->getSession()->executeScript($adjustJcropSelectionBoxJavaScript);
-
-        sleep(2);
-
-        $assertJcropSelectionBoxJavaScript = <<<JS
-            var selectedArea = $('#$targetImageId').data('Jcrop').tellSelect();
-
-            return selectedArea.x  === $positionLeft &&
-                   selectedArea.y  === $positionTop &&
-                   selectedArea.x2 === $positionRight &&
-                   selectedArea.y2 === $positionBottom &&
-                   selectedArea.w  === $sideLength &&
-                   selectedArea.h  === $sideLength;
-JS;
-        $this->assertByJavaScript(
-            $assertJcropSelectionBoxJavaScript,
-            'Could not adjust Jcrop selection box on the specified image with id="' . $targetImageId .
-            '", and position X "' . $positionLeft .
-            '", position Y "' . $positionTop .
-            '" and side length of "' . $sideLength . '".'
-        );
-    }
-
-    /**
      * Returns fixed step argument (with \\" replaced back to ").
      *
      * @param string $argument

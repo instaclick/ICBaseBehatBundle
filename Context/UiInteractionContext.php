@@ -1206,6 +1206,7 @@ JS;
      */
     public function iWaitSecond($delay)
     {
+        throw new \Exception("Static waits should never be used. This step is deprecated and will be removed soon.");
         sleep($delay);
     }
 

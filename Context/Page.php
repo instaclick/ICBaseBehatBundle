@@ -32,6 +32,22 @@ class Page extends BasePage
     /**
      * {@inheritdoc}
      */
+    public function getParameter($name)
+    {
+        return parent::getParameter($name);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPath()
+    {
+        return parent::getPath();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function find($alias, $locator)
     {
         if ($alias === 'xpath') {

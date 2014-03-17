@@ -55,7 +55,8 @@ class HookContext extends RawMinkContext implements KernelAwareInterface
     }
 
     /**
-     * Use AfterScenario hook to automatically log out for increased test isolation
+     * Use AfterScenario hook to automatically log out for increased test isolation.
+     * Has the same effect as Behat's @insulated tag.
      *
      * @param \Behat\Behat\Event\BaseScenarioEvent $event Event (unused)
      *

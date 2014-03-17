@@ -188,24 +188,6 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
-     * Use BeforeScenario hook to automatically clear APC cache for increased test isolation
-     *
-     * @param \Behat\Behat\Event\BaseScenarioEvent $event Event (unused)
-     *
-     * @BeforeScenario
-     */
-    public function prepareApcCache(BaseScenarioEvent $event = null)
-    {
-        $router = $this->kernel->getContainer()->get('router');
-
-        $url = rtrim($this->getMinkParameter('base_url'), '/')
-             . $router->generate('ICBaseBehatBundle_Page_Apc_Delete');
-
-        $client = new Client;
-        $client->post($url)->send();
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function assertPageAddress($page)

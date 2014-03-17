@@ -53,4 +53,21 @@ class HookContext extends RawMinkContext implements KernelAwareInterface
         $client = new Client();
         $client->post($url)->send();
     }
+
+    /**
+     * Use AfterScenario hook to automatically log out for increased test isolation
+     *
+     * @param \Behat\Behat\Event\BaseScenarioEvent $event Event (unused)
+     *
+     * @AfterScenario
+     */
+    public function autoLogout(BaseScenarioEvent $event = null)
+    {
+        $context = $event->getContext();
+        $session = $context->getSession();
+
+        if ($session && $session->isStarted()) {
+            $session->stop();
+        }
+    }
 }

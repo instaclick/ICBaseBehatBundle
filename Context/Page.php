@@ -63,7 +63,7 @@ class Page extends BasePage
      * @param string  $url
      * @param boolean $follow
      */
-    public function getRequest($url, $follow = false)
+    public function getRequest($url, $follow = true)
     {
         $driver = $this->getSession()->getDriver();
 

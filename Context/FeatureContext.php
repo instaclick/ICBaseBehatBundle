@@ -97,10 +97,9 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
 
         $select = $this->fixStepArgument($select);
         $option = $this->fixStepArgument($option);
-        $that   = $this;
 
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($select, $option, $that) {
-            $that->getSession()->getPage()->selectFieldOption($select, $option);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($select, $option) {
+            $this->getSession()->getPage()->selectFieldOption($select, $option);
         });
     }
 
@@ -110,10 +109,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function clickLink($link)
     {
         $link = $this->fixStepArgument($link);
-        $that = $this;
-
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($link, $that) {
-            $that->getSession()->getPage()->clickLink($link);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($link) {
+            $this->getSession()->getPage()->clickLink($link);
         });
     }
 
@@ -127,10 +124,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
             ".//*[self::input | self::textarea | self::select][not(./@type = 'submit' or ./@type = 'image' or ./@type = 'hidden')][(((./@id = %locator% or ./@name = %locator%) or ./@id = //label[contains(normalize-space(string(.)), %locator%)]/@for) or ./@placeholder = %locator%)] | .//label[contains(normalize-space(string(.)), %locator%)]//.//*[self::input | self::textarea | self::select][not(./@type = 'submit' or ./@type = 'image' or ./@type = 'hidden')] | .//label[contains(normalize-space(string(.)), %locator%)]/../div/div/*[self::input | self::textarea | self::select][not(./@type = 'submit' or ./@type = 'image' or ./@type = 'hidden')]"
         );
 
-        $that = $this;
-
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($field, $value, $that) {
-            $that->assertSession()->fieldValueEquals($field, $value);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($field, $value) {
+            $this->assertSession()->fieldValueEquals($field, $value);
         });
     }
 
@@ -146,10 +141,9 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         );
 
         $checkbox = $this->fixStepArgument($checkbox);
-        $that     = $this;
 
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($checkbox, $that) {
-            $that->assertSession()->checkboxChecked($checkbox);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($checkbox) {
+            $this->assertSession()->checkboxChecked($checkbox);
         });
     }
 
@@ -165,10 +159,9 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         );
 
         $checkbox = $this->fixStepArgument($checkbox);
-        $that     = $this;
 
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($checkbox, $that) {
-            $that->assertSession()->checkboxNotChecked($checkbox);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($checkbox) {
+            $this->assertSession()->checkboxNotChecked($checkbox);
         });
     }
 
@@ -192,10 +185,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function assertPageAddress($page)
     {
-        $that = $this;
-
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($page, $that) {
-            $that->assertSession()->addressEquals($that->locatePath($page));
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($page) {
+            $this->assertSession()->addressEquals($this->locatePath($page));
         });
     }
 
@@ -204,10 +195,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function assertHomepage()
     {
-        $that = $this;
-
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($that) {
-            $that->assertSession()->addressEquals($that->locatePath('/'));
+        $this->getSubcontext('SpinCommandContext')->spin(function () {
+            $this->assertSession()->addressEquals($this->locatePath('/'));
         });
     }
 
@@ -217,10 +206,9 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function assertUrlRegExp($pattern)
     {
         $pattern = $this->fixStepArgument($pattern);
-        $that    = $this;
 
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($pattern, $that) {
-            $that->assertSession()->addressMatches($pattern);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($pattern) {
+            $this->assertSession()->addressMatches($pattern);
         });
     }
 
@@ -229,10 +217,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function assertResponseStatus($code)
     {
-        $that = $this;
-
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($code, $that) {
-            $that->assertSession()->statusCodeEquals($code);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($code) {
+            $this->assertSession()->statusCodeEquals($code);
         });
     }
 
@@ -241,10 +227,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function assertResponseStatusIsNot($code)
     {
-        $that = $this;
-
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($code, $that) {
-            $that->assertSession()->statusCodeNotEquals($code);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($code) {
+            $this->assertSession()->statusCodeNotEquals($code);
         });
     }
 
@@ -254,10 +238,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function assertPageContainsText($text)
     {
         $text = $this->fixStepArgument($text);
-        $that = $this;
-
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($text, $that) {
-            $that->assertSession()->pageTextContains($text);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($text) {
+            $this->assertSession()->pageTextContains($text);
         });
     }
 
@@ -267,10 +249,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function assertPageNotContainsText($text)
     {
         $text = $this->fixStepArgument($text);
-        $that = $this;
-
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($text, $that) {
-            $that->assertSession()->pageTextNotContains($text);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($text) {
+            $this->assertSession()->pageTextNotContains($text);
         });
     }
 
@@ -280,10 +260,9 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function assertPageMatchesText($pattern)
     {
         $pattern = $this->fixStepArgument($pattern);
-        $that    = $this;
 
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($pattern, $that) {
-            $that->assertSession()->pageTextMatches($pattern);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($pattern) {
+            $this->assertSession()->pageTextMatches($pattern);
         });
     }
 
@@ -293,10 +272,9 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function assertPageNotMatchesText($pattern)
     {
         $pattern = $this->fixStepArgument($pattern);
-        $that    = $this;
 
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($pattern, $that) {
-            $that->assertSession()->pageTextNotMatches($pattern);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($pattern) {
+            $this->assertSession()->pageTextNotMatches($pattern);
         });
     }
 
@@ -306,10 +284,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function assertResponseContains($text)
     {
         $text = $this->fixStepArgument($text);
-        $that = $this;
-
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($text, $that) {
-            $that->assertSession()->responseContains($text);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($text) {
+            $this->assertSession()->responseContains($text);
         });
     }
 
@@ -319,10 +295,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function assertResponseNotContains($text)
     {
         $text = $this->fixStepArgument($text);
-        $that = $this;
-
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($text, $that) {
-            $that->assertSession()->responseNotContains($text);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($text) {
+            $this->assertSession()->responseNotContains($text);
         });
     }
 
@@ -332,10 +306,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function assertElementContainsText($element, $text)
     {
         $text = $this->fixStepArgument($text);
-        $that = $this;
-
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($element, $text, $that) {
-            $that->assertSession()->elementTextContains('css', $element, $text);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($element, $text) {
+            $this->assertSession()->elementTextContains('css', $element, $text);
         });
     }
 
@@ -345,10 +317,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function assertElementNotContainsText($element, $text)
     {
         $text = $this->fixStepArgument($text);
-        $that = $this;
-
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($element, $text, $that) {
-            $that->assertSession()->elementTextNotContains('css', $element, $text);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($element, $text) {
+            $this->assertSession()->elementTextNotContains('css', $element, $text);
         });
     }
 
@@ -358,10 +328,9 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function assertElementContains($element, $value)
     {
         $value = $this->fixStepArgument($value);
-        $that  = $this;
 
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($element, $value, $that) {
-            $that->assertSession()->elementContains('css', $element, $value);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($element, $value) {
+            $this->assertSession()->elementContains('css', $element, $value);
         });
     }
 
@@ -371,10 +340,9 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     public function assertElementNotContains($element, $value)
     {
         $value = $this->fixStepArgument($value);
-        $that  = $this;
 
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($element, $value, $that) {
-            $that->assertSession()->elementNotContains('css', $element, $value);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($element, $value) {
+            $this->assertSession()->elementNotContains('css', $element, $value);
         });
     }
 
@@ -383,10 +351,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function assertElementOnPage($element)
     {
-        $that = $this;
-
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($element, $that) {
-            $that->assertSession()->elementExists('css', $element);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($element) {
+            $this->assertSession()->elementExists('css', $element);
         });
     }
 
@@ -395,10 +361,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function assertElementNotOnPage($element)
     {
-        $that = $this;
-
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($element, $that) {
-            $that->assertSession()->elementNotExists('css', $element);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($element) {
+            $this->assertSession()->elementNotExists('css', $element);
         });
     }
 
@@ -409,10 +373,9 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     {
         $field = $this->fixStepArgument($field);
         $value = $this->fixStepArgument($value);
-        $that  = $this;
 
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($field, $value, $that) {
-            $that->assertSession()->fieldValueNotEquals($field, $value);
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($field, $value) {
+            $this->assertSession()->fieldValueNotEquals($field, $value);
         });
     }
 
@@ -421,10 +384,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      */
     public function assertNumElements($num, $element)
     {
-        $that = $this;
-
-        $this->getSubcontext('SpinCommandContext')->spin(function () use ($num, $element, $that) {
-            $that->assertSession()->elementsCount('css', $element, intval($num));
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($num, $element) {
+            $this->assertSession()->elementsCount('css', $element, intval($num));
         });
     }
 

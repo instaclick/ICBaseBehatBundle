@@ -1685,4 +1685,17 @@ JS;
 
         $this->getSession()->executeScript($javascript);
     }
+
+    /**
+     * Assert that a link element specified by it's XPath matches expected href attribute.
+     *
+     * @param string $elementXPath
+     * @param string $uri
+     *
+     * @Then /^the element at XPath "([^"]*)" should have "([^"]*)" as destination$/
+     */
+    public function elementAtXpathShouldHaveAsDestination($elementXPath, $uri)
+    {
+        $this->assertSession()->elementAttributeContains('xpath', $elementXPath, 'href', $uri);
+    }
 }

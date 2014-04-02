@@ -1170,29 +1170,15 @@ JS;
     }
 
     /**
-     * Wait for specified number of seconds
+     * Pause to debug for specified number of seconds.
      *
      * @param string $delay Delay in seconds
      *
-     * @When /^(?:|I )wait (\d+) seconds?$/
+     * @When /^(?:|I )pause to debug for (\d+) seconds?$/
      */
-    public function iWaitSecond($delay)
+    public function iPauseToDebug($delay)
     {
-        throw new \Exception("Static waits should never be used. This step is deprecated and will be removed soon.");
         sleep($delay);
-    }
-
-    /**
-     * Wait for condition or timeout
-     *
-     * @param string       $timeout    Timeout in milliseconds
-     * @param PyStringNode $javascript JavaScript
-     *
-     * @When /^(?:|I )wait (\d+) seconds or until:$/
-     */
-    public function iWaitUntil($timeout, PyStringNode $javascript)
-    {
-        $this->getSession()->wait($timeout * 1000, $javascript);
     }
 
     /**

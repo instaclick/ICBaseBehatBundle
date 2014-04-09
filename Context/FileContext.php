@@ -89,8 +89,8 @@ class FileContext extends RawMinkContext implements KernelAwareInterface
     /**
      * Creates a file with specified name and context in current workdir.
      *
-     * @param string                          $filename name of the file (relative path)
-     * @param Behat\Gherkin\Node\PyStringNode $content  PyString string instance
+     * @param string                           $filename name of the file (relative path)
+     * @param \Behat\Gherkin\Node\PyStringNode $content  PyString string instance
      *
      * @Given /^(?:there is )?a file named "([^"]*)" with:$/
      */
@@ -143,7 +143,7 @@ class FileContext extends RawMinkContext implements KernelAwareInterface
     /**
      * Sets specified ENV variable
      *
-     * @param PyStringNode $value
+     * @param \Behat\Gherkin\Node\PyStringNode $value
      *
      * @When /^"BEHAT_PARAMS" environment variable is set to:$/
      */

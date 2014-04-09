@@ -1032,8 +1032,8 @@ JS;
     /**
      * Enter a multiline string (Pystring) into a textbox
      *
-     * @param string       $textbox  name of text box to be filled with a Pystring
-     * @param PyStringNode $pyString the pystring to be submitted
+     * @param string                           $textbox  name of text box to be filled with a Pystring
+     * @param \Behat\Gherkin\Node\PyStringNode $pyString the pystring to be submitted
      *
      * @Given /^(?:|I ) fill in "([^"]+)" with:/
      */
@@ -1162,7 +1162,7 @@ JS;
      *
      * @param string $xPath XPath
      *
-     * @return NodeElement|null
+     * @return \Behat\Mink\Element\NodeElement|null
      */
     public function findElementByXpath($xPath)
     {

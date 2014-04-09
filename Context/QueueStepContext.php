@@ -33,9 +33,9 @@ class QueueStepContext extends RawMinkContext
     /**
      * I will (be) ...
      *
-     * @param string    $be    "be" (or '' if not present)
-     * @param string    $step  Step text
-     * @param TableNode $table Optional table
+     * @param string                        $be    "be" (or '' if not present)
+     * @param string                        $step  Step text
+     * @param \Behat\Gherkin\Node\TableNode $table Optional table
      *
      * @return array|void
      *
@@ -63,8 +63,8 @@ class QueueStepContext extends RawMinkContext
     /**
      * I should later (also) ...
      *
-     * @param string    $step  Step text
-     * @param TableNode $table Optional table
+     * @param string                        $step  Step text
+     * @param \Behat\Gherkin\Node\TableNode $table Optional table
      *
      * @return array|void
      *
@@ -92,7 +92,7 @@ class QueueStepContext extends RawMinkContext
     /**
      * Do it for each:
      *
-     * @param TableNode $table
+     * @param \Behat\Gherkin\Node\TableNode $table
      *
      * @return array
      *

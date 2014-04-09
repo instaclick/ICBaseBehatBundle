@@ -455,7 +455,7 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      *
      * @param string $xPath XPath
      *
-     * @return NodeElement|null
+     * @return \Behat\Mink\Element\NodeElement|null
      */
     private function findElementByXpath($xPath)
     {

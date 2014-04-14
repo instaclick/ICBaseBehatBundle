@@ -1641,7 +1641,7 @@ JS;
     }
 
     /**
-     * Assert that a link element specified by it's XPath matches expected href attribute.
+     * Assert that a link element specified by its XPath matches expected href attribute.
      *
      * @param string $elementXPath
      * @param string $uri

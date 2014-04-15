@@ -27,7 +27,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class UiInteractionContext extends RawMinkContext implements KernelAwareInterface
 {
     /**
-     * @var KernelInterface Kernel
+     * @var \Symfony\Component\HttpKernel\KernelInterface
      */
     private $kernel;
 

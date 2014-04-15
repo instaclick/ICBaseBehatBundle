@@ -27,7 +27,7 @@ require_once 'PHPUnit/Framework/Assert/Functions.php';
 class FileContext extends RawMinkContext implements KernelAwareInterface
 {
     /**
-     * @var KernelInterface Kernel
+     * @var \Symfony\Component\HttpKernel\KernelInterface
      */
     private $kernel;
 

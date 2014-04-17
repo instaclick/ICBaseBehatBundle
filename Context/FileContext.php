@@ -391,21 +391,21 @@ class FileContext extends RawMinkContext implements KernelAwareInterface
     }
 
     /**
-     * Run a console command with optional arguement
+     * Run a console command with optional argument
      *
      * @param string $name
-     * @param string $arguement
+     * @param string $argument
      * @param string $value
      *
-     * @When /^I run "([^"]*)" command with arguement "([^"]*)" equals "([^"]*)"$/
+     * @When /^I run "([^"]*)" command with argument "([^"]*)" equals "([^"]*)"$/
      */
-    public function iRunCommand($name, $arguement, $value)
+    public function iRunCommand($name, $argument, $value)
     {
         $application = new Application($this->kernel);
         $application->add(new PPLStatusCommand());
         $command = $application->find($name);
         $this->tester = new CommandTester($command);
-        $this->tester->execute(array('command' => $command->getName(), $arguement => $value));
+        $this->tester->execute(array('command' => $command->getName(), $argument => $value));
     }
 
     /**

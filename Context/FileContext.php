@@ -390,22 +390,27 @@ class FileContext extends RawMinkContext implements KernelAwareInterface
         }
     }
 
-    /**
-     * Run a console command with optional arguement
+   /**
+     * Run a console command with optional argument
      *
-     * @param string $name
-     * @param string $arguement
-     * @param string $value
+     * @param \Behat\Gherkin\Node\TableNode $table
      *
-     * @When /^I run "([^"]*)" command with arguement "([^"]*)" equals "([^"]*)"$/
+     * @Given /^I run console command:$/
      */
-    public function iRunCommand($name, $arguement, $value)
+    public function iRunCommand(TableNode $table)
     {
+        $commandHash = $table->getHash();
+        $commandArgs = array();
+
+        foreach ($commandHash[0] as $key => $value) {
+            $commandArgs[$key] = $value;
+        }
+
         $application = new Application($this->kernel);
         $application->add(new PPLStatusCommand());
-        $command = $application->find($name);
+        $command = $application->find($commandArgs['command']);
         $this->tester = new CommandTester($command);
-        $this->tester->execute(array('command' => $command->getName(), $arguement => $value));
+        $this->tester->execute($commandArgs);
     }
 
     /**

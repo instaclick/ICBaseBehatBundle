@@ -422,6 +422,6 @@ class FileContext extends RawMinkContext implements KernelAwareInterface
      */
     public function iShouldSee($string)
     {
-        assertSame($string, $this->tester->getDisplay());
+        assertSame(trim($string), trim($this->tester->getDisplay()));
     }
 }

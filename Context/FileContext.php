@@ -8,6 +8,9 @@ use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\MinkExtension\Context\RawMinkContext;
 use Behat\Symfony2Extension\Context\KernelAwareInterface;
+use IC\Bundle\Affiliate\TrackingBundle\Command\PPLStatusCommand;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 //
@@ -26,6 +29,11 @@ require_once 'PHPUnit/Framework/Assert/Functions.php';
  */
 class FileContext extends RawMinkContext implements KernelAwareInterface
 {
+    /**
+     * @var Symfony\Component\Console\Tester\CommandTester
+     */
+    private $tester;
+
     /**
      * @var KernelInterface Kernel
      */
@@ -380,5 +388,35 @@ class FileContext extends RawMinkContext implements KernelAwareInterface
             default:
                 assertEquals(0, $this->return);
         }
+    }
+
+    /**
+     * Run a console command with optional arguement
+     *
+     * @param string $name
+     * @param string $arguement
+     * @param string $value
+     *
+     * @When /^I run "([^"]*)" command with arguement "([^"]*)" equals "([^"]*)"$/
+     */
+    public function iRunCommand($name, $arguement, $value)
+    {
+        $application = new Application($this->kernel);
+        $application->add(new PPLStatusCommand());
+        $command = $application->find($name);
+        $this->tester = new CommandTester($command);
+        $this->tester->execute(array('command' => $command->getName(), $arguement => $value));
+    }
+
+    /**
+     * Check if strings are the same
+     *
+     * @param string $string
+     *
+     * @Then /^I should see$/
+     */
+    public function iShouldSee($string)
+    {
+        assertSame($string, $this->tester->getDisplay());
     }
 }

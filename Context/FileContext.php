@@ -390,7 +390,7 @@ class FileContext extends RawMinkContext implements KernelAwareInterface
         }
     }
 
-   /**
+    /**
      * Run a console command with optional argument
      *
      * @param \Behat\Gherkin\Node\TableNode $table

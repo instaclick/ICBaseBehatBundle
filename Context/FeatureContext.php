@@ -32,7 +32,7 @@ require_once 'PHPUnit/Framework/Assert/Functions.php';
 class FeatureContext extends MinkContext implements KernelAwareInterface
 {
     /**
-     * @var KernelInterface Kernel
+     * @var \Symfony\Component\HttpKernel\KernelInterface
      */
     private $kernel;
 

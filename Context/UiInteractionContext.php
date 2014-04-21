@@ -27,7 +27,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class UiInteractionContext extends RawMinkContext implements KernelAwareInterface
 {
     /**
-     * @var KernelInterface Kernel
+     * @var \Symfony\Component\HttpKernel\KernelInterface
      */
     private $kernel;
 
@@ -1641,7 +1641,7 @@ JS;
     }
 
     /**
-     * Assert that a link element specified by it's XPath matches expected href attribute.
+     * Assert that a link element specified by its XPath matches expected href attribute.
      *
      * @param string $elementXPath
      * @param string $uri

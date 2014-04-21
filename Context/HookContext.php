@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class HookContext extends RawMinkContext implements KernelAwareInterface
 {
     /**
-     * @var \Symfony\Component\HttpKernel\KernelInterface Kernel
+     * @var \Symfony\Component\HttpKernel\KernelInterface
      */
     private $kernel;
 

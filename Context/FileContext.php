@@ -35,7 +35,7 @@ class FileContext extends RawMinkContext implements KernelAwareInterface
     private $tester;
 
     /**
-     * @var KernelInterface Kernel
+     * @var \Symfony\Component\HttpKernel\KernelInterface
      */
     private $kernel;
 

@@ -17,7 +17,7 @@ use Behat\MinkExtension\Context\RawMinkContext;
 class CookieContext extends RawMinkContext
 {
     /**
-     * @var array Local cookie store
+     * @var array
      */
     private $cookies = array();
 

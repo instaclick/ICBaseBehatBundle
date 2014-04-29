@@ -30,7 +30,7 @@ require_once 'PHPUnit/Framework/Assert/Functions.php';
 class FileContext extends RawMinkContext implements KernelAwareInterface
 {
     /**
-     * @var Symfony\Component\Console\Tester\CommandTester
+     * @var \Symfony\Component\Console\Tester\CommandTester
      */
     private $tester;
 
@@ -38,6 +38,13 @@ class FileContext extends RawMinkContext implements KernelAwareInterface
      * @var \Symfony\Component\HttpKernel\KernelInterface
      */
     private $kernel;
+
+    /**
+     * @var array
+     */
+    private $commandDictionary = array(
+        'ic:affiliate:tracking:ppl:status' => 'IC\Bundle\Affiliate\TrackingBundle\Command\PPLStatusCommand',
+        'ic:base:riak:bucket:declare'      => 'IC\Bundle\Base\RiakBundle\Command\RiakBucketPropertyListCommand');
 
     /**
      * {@inheritdoc}
@@ -406,8 +413,10 @@ class FileContext extends RawMinkContext implements KernelAwareInterface
             $commandArgs[$key] = $value;
         }
 
+        $commandName = $this->commandDictionary[$commandHash[0]['command']];
+
         $application = new Application($this->kernel);
-        $application->add(new PPLStatusCommand());
+        $application->add(new $commandName());
         $command = $application->find($commandArgs['command']);
         $this->tester = new CommandTester($command);
         $this->tester->execute($commandArgs);

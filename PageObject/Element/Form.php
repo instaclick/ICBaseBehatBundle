@@ -3,9 +3,10 @@
  * @copyright 2014 Instaclick Inc.
  */
 
-namespace IC\Bundle\Base\BehatBundle\PageObject;
+namespace IC\Bundle\Base\BehatBundle\PageObject\Element;
 
 use Behat\Mink\Session;
+use IC\Bundle\Base\BehatBundle\Form\ElementHandlerInterface;
 use SensioLabs\Behat\PageObjectExtension\Context\PageFactoryInterface;
 
 /**
@@ -13,7 +14,7 @@ use SensioLabs\Behat\PageObjectExtension\Context\PageFactoryInterface;
  *
  * @author John Cartwright <johnc@nationalfibre.net>
  */
-class FormElement extends Element
+class Form extends Element
 {
     /**
      * @var array $handlerList
@@ -42,29 +43,39 @@ class FormElement extends Element
      *
      * @param string   $property
      * @param callable $callback
+     *
+     * @return \IC\Bundle\Base\BehatBundle\PageObject\Element\Form
      */
     public function addListener($property, callable $callback)
     {
         $this->listenerList[$property] = $callback;
+
+        return $this;
     }
 
     /**
      * Attach an property element to a form property.
      *
-     * @param string                                                    $property
-     * @param \IC\Bundle\Base\BehatBundle\PageObject\FormElementHandler $formElementHandler
+     * @param string                                                       $property
+     * @param \IC\Bundle\Base\BehatBundle\Form\FormElementHandlerInterface $formElementHandler
+     *
+     * @return \IC\Bundle\Base\BehatBundle\PageObject\Element\Form
      */
-    public function addHandler($property, FormElementHandler $formElementHandler)
+    public function addHandler($property, ElementHandlerInterface $formElementHandler)
     {
         $formElementHandler->setContainerElement($this);
 
         $this->handlerList[$property] = $formElementHandler;
+
+        return $this;
     }
 
     /**
      * Set the form data.
      *
      * @param array $data
+     *
+     * @return \IC\Bundle\Base\BehatBundle\PageObject\Element\Form
      */
     public function setData($data)
     {
@@ -79,8 +90,54 @@ class FormElement extends Element
                 continue;
             }
 
-            call_user_func($this->listenerList[$key]);
+            call_user_func_array($this->listenerList[$key], array($this));
         }
+
+        return $this;
+    }
+
+    /**
+     * Retrieve the form data.
+     *
+     * @return array
+     */
+    public function getData()
+    {
+        $formData = array();
+
+        foreach ($this->handlerList as $key => $handler) {
+            $formData[$key] = $handler->getValue();
+        }
+
+        return $formData;
+    }
+
+    /**
+     * Retrieve the form error list.
+     *
+     * @param array $keyList Fields to restrict lookups to
+     *
+     * @return array
+     */
+    public function getErrorList($keyList = null)
+    {
+        $errorList = array();
+
+        foreach ($this->handlerList as $key => $handler) {
+            if ($keyList && ! in_array($key, $keyList)) {
+                continue;
+            }
+
+            $error = $handler->getError();
+
+            if ($error === null) {
+                continue;
+            }
+
+            $errorList[$key] = $error;
+        }
+
+        return $errorList;
     }
 
     /**
@@ -88,7 +145,7 @@ class FormElement extends Element
      *
      * @return array
      */
-    public function getHandlerList()
+    protected function getHandlerList()
     {
         return array();
     }

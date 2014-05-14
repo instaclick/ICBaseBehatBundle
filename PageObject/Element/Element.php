@@ -1,8 +1,7 @@
 <?php
 
-namespace IC\Bundle\Base\BehatBundle\PageObject;
+namespace IC\Bundle\Base\BehatBundle\PageObject\Element;
 
-use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Mink\Session;
 use SensioLabs\Behat\PageObjectExtension\Context\PageFactoryInterface;
 use SensioLabs\Behat\PageObjectExtension\PageObject\Element as BaseElement;

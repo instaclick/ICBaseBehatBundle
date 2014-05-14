@@ -3,17 +3,17 @@
  * @copyright 2014 Instaclick Inc.
  */
 
-namespace IC\Bundle\Base\BehatBundle\PageObject;
+namespace IC\Bundle\Base\BehatBundle\Form;
 
-use SensioLabs\Behat\PageObjectExtension\PageObject\Element as BaseElement;
+use SensioLabs\Behat\PageObjectExtension\PageObject\Element;
 use SensioLabs\Behat\PageObjectExtension\PageObject\Exception\ElementNotFoundException;
 
 /**
- * Form Element Handler base class.
+ * Form Element List Handler.
  *
  * @author John Cartwright <johnc@nationalfibre.net>
  */
-abstract class FormElementHandler
+abstract class ElementListHandler implements ElementHandlerInterface
 {
     /**
      * @var \SensioLabs\Behat\PageObjectExtension\PageObject\Element
@@ -23,7 +23,7 @@ abstract class FormElementHandler
     /**
      * @var string
      */
-    private $locator;
+    protected $locator;
 
     /**
      * Constructor.
@@ -40,26 +40,25 @@ abstract class FormElementHandler
      *
      * @param \SensioLabs\Behat\PageObjectExtension\PageObject\Element $containerElement
      */
-    public function setContainerElement(BaseElement $containerElement)
+    public function setContainerElement(Element $containerElement)
     {
         $this->containerElement = $containerElement;
     }
 
     /**
-     * Retrieve the first element.
+     * Retrieve the element error.
      *
-     * @throws \SensioLabs\Behat\PageObjectExtension\PageObject\Exception\ElementNotFoundException
-     * @return \SensioLabs\Behat\PageObjectExtension\PageObject\Element
+     * @return string|null
      */
-    protected function getElement()
+    public function getError()
     {
-        $element = $this->containerElement->find('xpath', sprintf('//*[@name="%s"]', $this->locator));
+        $errorElement = $this->containerElement->find('xpath', sprintf('//div[@class="control-group error"][div[@class="controls"]//*[@name="%s"]]//span[@class="help-block message error"]', $this->locator));
 
-        if ( ! $element) {
-            throw new ElementNotFoundException(sprintf('Element [%s] was not found', $this->locator));
+        if ( ! $errorElement) {
+            return null;
         }
 
-        return $element;
+        return $errorElement->getText();
     }
 
     /**
@@ -68,7 +67,7 @@ abstract class FormElementHandler
      * @throws \SensioLabs\Behat\PageObjectExtension\PageObject\Exception\ElementNotFoundException
      * @return array
      */
-    protected function getElementList()
+    public function getElement()
     {
         $elementList = $this->containerElement->findAll('xpath', sprintf('//*[@name="%s"]', $this->locator));
 
@@ -78,18 +77,4 @@ abstract class FormElementHandler
 
         return $elementList;
     }
-
-    /**
-     * Retrieve the element(s) value.
-     *
-     * @return mixed
-     */
-    abstract public function getValue();
-
-    /**
-     * Define the element(s) value.
-     *
-     * @param mixed $value
-     */
-    abstract public function setValue($value);
 }

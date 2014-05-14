@@ -3,9 +3,9 @@
  * @copyright 2014 Instaclick Inc.
  */
 
-namespace IC\Bundle\Base\BehatBundle\PageObject\FormElementHandler;
+namespace IC\Bundle\Base\BehatBundle\Form\ElementHandler;
 
-use IC\Bundle\Base\BehatBundle\PageObject\FormElementHandler as BaseHandler;
+use IC\Bundle\Base\BehatBundle\Form\ElementHandler as BaseHandler;
 
 /**
  * Input form handler.
@@ -19,7 +19,7 @@ class Input extends BaseHandler
      */
     public function getValue()
     {
-        $this->getElement()->getValue();
+        return $this->getElement()->getValue();
     }
 
     /**

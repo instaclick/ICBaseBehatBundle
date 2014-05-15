@@ -26,9 +26,7 @@ abstract class ElementListHandler implements ElementHandlerInterface
     protected $locator;
 
     /**
-     * Constructor.
-     *
-     * @param string $locator
+     * {@inheritdoc}
      */
     public function __construct($locator)
     {
@@ -36,9 +34,7 @@ abstract class ElementListHandler implements ElementHandlerInterface
     }
 
     /**
-     * Define the container element.
-     *
-     * @param \SensioLabs\Behat\PageObjectExtension\PageObject\Element $containerElement
+     * {@inheritdoc}
      */
     public function setContainerElement(Element $containerElement)
     {
@@ -46,9 +42,7 @@ abstract class ElementListHandler implements ElementHandlerInterface
     }
 
     /**
-     * Retrieve the element error.
-     *
-     * @return string|null
+     * {@inheritdoc}
      */
     public function getError()
     {
@@ -62,10 +56,7 @@ abstract class ElementListHandler implements ElementHandlerInterface
     }
 
     /**
-     * Retrieve the element list.
-     *
-     * @throws \SensioLabs\Behat\PageObjectExtension\PageObject\Exception\ElementNotFoundException
-     * @return array
+     * {@inheritdoc}
      */
     public function getElement()
     {

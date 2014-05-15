@@ -81,7 +81,7 @@ class Form extends Element
     {
         foreach ($data as $key => $value) {
             if ( ! isset($this->handlerList[$key])) {
-                continue;
+                throw new \InvalidArgumentException(sprintf('Cannot set value for unknown property handler [%s]', $key));
             }
 
             $this->handlerList[$key]->setValue($value);

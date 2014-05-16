@@ -16,9 +16,20 @@ use Behat\MinkExtension\Context\RawMinkContext;
 class SpinCommandContext extends RawMinkContext
 {
     /**
-     * The divisor for the attempt threshold.
+     * @var array
      */
-    const DIVISOR = 1000000;
+    private $microSecondDelayList = array(
+        200000,
+        300000,
+        400000,
+        600000,
+        800000,
+        1000000,
+        2000000,
+        4000000,
+        6000000,
+        8000000,
+    );
 
     /**
      * Keep retrying assertion for a defined number of iterations.
@@ -30,14 +41,14 @@ class SpinCommandContext extends RawMinkContext
      *
      * @return mixed
      */
-    public function spin($lambda, $attemptThreshold = 15)
+    public function spin($lambda, $attemptThreshold = 9)
     {
-        for ($iteration = 1; $iteration <= $attemptThreshold; $iteration++) {
+        for ($iteration = 0; $iteration <= $attemptThreshold; $iteration++) {
             try {
                 return call_user_func($lambda);
             } catch (\Exception $exception) {
                 if ($iteration < $attemptThreshold) {
-                    usleep($this->getNextDelay($iteration, $attemptThreshold));
+                    usleep($this->microSecondDelayList[$iteration]);
 
                     continue;
                 }
@@ -45,23 +56,5 @@ class SpinCommandContext extends RawMinkContext
                 throw $exception;
             }
         }
-    }
-
-    /**
-     * Get the next delay value.
-     *
-     *    With an $attemptThreshold of 15 and a divisor of 1,000,000 the
-     *    total amount of delay time will be 16.6 seconds (not counting
-     *    $lambda execution time) and there will be 12 delays that are
-     *    less than 1 second.
-     *
-     * @param integer $iteration
-     * @param integer $attemptThreshold
-     *
-     * @return integer
-     */
-    private function getNextDelay($iteration, $attemptThreshold)
-    {
-        return ($attemptThreshold / self::DIVISOR) * pow($iteration, 10);
     }
 }

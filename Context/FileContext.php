@@ -8,6 +8,9 @@ use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\MinkExtension\Context\RawMinkContext;
 use Behat\Symfony2Extension\Context\KernelAwareInterface;
+use IC\Bundle\Affiliate\TrackingBundle\Command\PPLStatusCommand;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 //
@@ -27,9 +30,21 @@ require_once 'PHPUnit/Framework/Assert/Functions.php';
 class FileContext extends RawMinkContext implements KernelAwareInterface
 {
     /**
+     * @var \Symfony\Component\Console\Tester\CommandTester
+     */
+    private $tester;
+
+    /**
      * @var \Symfony\Component\HttpKernel\KernelInterface
      */
     private $kernel;
+
+    /**
+     * @var array
+     */
+    private $commandDictionary = array(
+        'ic:affiliate:tracking:ppl:status' => 'IC\Bundle\Affiliate\TrackingBundle\Command\PPLStatusCommand',
+        'ic:base:riak:bucket:declare'      => 'IC\Bundle\Base\RiakBundle\Command\RiakBucketPropertyListCommand');
 
     /**
      * {@inheritdoc}
@@ -380,5 +395,42 @@ class FileContext extends RawMinkContext implements KernelAwareInterface
             default:
                 assertEquals(0, $this->return);
         }
+    }
+
+    /**
+     * Run a console command with optional argument
+     *
+     * @param \Behat\Gherkin\Node\TableNode $table
+     *
+     * @Given /^I run console command:$/
+     */
+    public function iRunCommand(TableNode $table)
+    {
+        $commandHash = $table->getHash();
+        $commandArgs = array();
+
+        foreach ($commandHash[0] as $key => $value) {
+            $commandArgs[$key] = $value;
+        }
+
+        $commandName = $this->commandDictionary[$commandHash[0]['command']];
+
+        $application = new Application($this->kernel);
+        $application->add(new $commandName());
+        $command = $application->find($commandArgs['command']);
+        $this->tester = new CommandTester($command);
+        $this->tester->execute($commandArgs);
+    }
+
+    /**
+     * Check if strings are the same
+     *
+     * @param string $string
+     *
+     * @Then /^I should see$/
+     */
+    public function iShouldSee($string)
+    {
+        assertSame(trim($string), trim($this->tester->getDisplay()));
     }
 }

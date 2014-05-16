@@ -8,6 +8,7 @@ namespace IC\Bundle\Base\BehatBundle\PageObject\Element;
 use Behat\Mink\Session;
 use IC\Bundle\Base\BehatBundle\Form\ElementHandlerInterface;
 use SensioLabs\Behat\PageObjectExtension\Context\PageFactoryInterface;
+use SensioLabs\Behat\PageObjectExtension\PageObject\Element;
 
 /**
  * Form Element.
@@ -79,6 +80,10 @@ class Form extends Element
      */
     public function setData($data)
     {
+        if ( ! count($data)) {
+            return $this;
+        }
+
         $unknownHandlerKeyList = array_flip(array_diff_key($data, $this->handlerList));
 
         if (count($unknownHandlerKeyList)) {

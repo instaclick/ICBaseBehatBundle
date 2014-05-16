@@ -54,7 +54,7 @@ class Form extends Element
     }
 
     /**
-     * Attach an property element to a form property.
+     * Attach an property handler to a form element.
      *
      * @param string                                                       $property
      * @param \IC\Bundle\Base\BehatBundle\Form\FormElementHandlerInterface $formElementHandler
@@ -79,18 +79,18 @@ class Form extends Element
      */
     public function setData($data)
     {
-        foreach ($data as $key => $value) {
-            if ( ! isset($this->handlerList[$key])) {
-                throw new \InvalidArgumentException(sprintf('Cannot set value for unknown property handler [%s]', $key));
-            }
+        $unknownHandlerKeyList = array_flip(array_diff_key($data, $this->handlerList));
 
+        if (count($unknownHandlerKeyList)) {
+            throw new \InvalidArgumentException(sprintf('Cannot set value for unknown property handlers [%s]', implode(',', $unknownHandlerKeyList)));
+        }
+
+        foreach ($data as $key => $value) {
             $this->handlerList[$key]->setValue($value);
 
-            if ( ! isset($this->listenerList[$key])) {
-                continue;
+            if (isset($this->listenerList[$key])) {
+                call_user_func_array($this->listenerList[$key], array($this));
             }
-
-            call_user_func_array($this->listenerList[$key], array($this));
         }
 
         return $this;
@@ -123,11 +123,15 @@ class Form extends Element
     {
         $errorList = array();
 
-        foreach ($this->handlerList as $key => $handler) {
-            if ($keyList && ! in_array($key, $keyList)) {
-                continue;
-            }
+        if (count($keyList)) {
+            $unknownHandlerKeyList = $difference = array_diff($keyList, array_keys($this->handlerList));
 
+            if (count($unknownHandlerKeyList)) {
+                throw new \InvalidArgumentException(sprintf('Cannot set error for unknown property handlers [%s]', implode(',', $unknownHandlerKeyList)));
+            }
+        }
+
+        foreach ($this->handlerList as $key => $handler) {
             $error = $handler->getError();
 
             if ($error === null) {

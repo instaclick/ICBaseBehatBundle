@@ -57,7 +57,6 @@ abstract class Page extends BasePage
         return $element;
     }
 
-
     /**
      * Create the instance of the requested element.
      *

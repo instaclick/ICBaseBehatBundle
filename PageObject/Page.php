@@ -58,6 +58,16 @@ abstract class Page extends BasePage
     }
 
     /**
+     * Retrieve the page url.
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        return rtrim($this->getParameter('base_url'), '/') .'/'. ltrim($this->getPath(), '/');
+    }
+
+    /**
      * Create the instance of the requested element.
      *
      * @param string       $name
@@ -68,24 +78,5 @@ abstract class Page extends BasePage
     protected function createElement($name, $selector = null)
     {
         return $this->pageFactory->createElement($name, $selector);
-    }
-
-    /**
-     * GET request
-     *
-     * @param string  $url
-     * @param boolean $follow
-     *
-     * @return \Symfony\Component\BrowserKit\Response
-     */
-    public function get($url, $follow = true)
-    {
-        $driver = $this->getSession()->getDriver();
-        $client = $driver->getClient();
-
-        $client->followRedirects($follow);
-        $driver->visit($this->getParameter('base_url') . $url);
-
-        return $client->getResponse();
     }
 }

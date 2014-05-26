@@ -238,9 +238,9 @@ class FileContext extends RawMinkContext implements KernelAwareInterface
 
         try {
             assertEquals((string) $text, $this->output);
-        } catch (Exception $e) {
-            $diff = PHPUnit_Framework_TestFailure::exceptionToString($e);
-            throw new Exception($diff, $e->getCode(), $e);
+        } catch (\Exception $e) {
+            $diff = \PHPUnit_Framework_TestFailure::exceptionToString($e);
+            throw new \Exception($diff, $e->getCode(), $e);
         }
     }
 
@@ -259,9 +259,9 @@ class FileContext extends RawMinkContext implements KernelAwareInterface
         try {
             assertFileExists($path);
             assertEquals((string) $text, trim(file_get_contents($path)));
-        } catch (Exception $e) {
-            $diff = PHPUnit_Framework_TestFailure::exceptionToString($e);
-            throw new Exception($diff, $e->getCode(), $e);
+        } catch (\Exception $e) {
+            $diff = \PHPUnit_Framework_TestFailure::exceptionToString($e);
+            throw new \Exception($diff, $e->getCode(), $e);
         }
     }
 
@@ -280,9 +280,9 @@ class FileContext extends RawMinkContext implements KernelAwareInterface
 
         try {
             assertFileExists($filePath);
-        } catch (Exception $e) {
-            $diff = PHPUnit_Framework_TestFailure::exceptionToString($e);
-            throw new Exception($diff, $e->getCode(), $e);
+        } catch (\Exception $e) {
+            $diff = \PHPUnit_Framework_TestFailure::exceptionToString($e);
+            throw new \Exception($diff, $e->getCode(), $e);
         }
 
         if ($hashValue != hash_file($algorithm, $filePath)) {
@@ -305,9 +305,9 @@ class FileContext extends RawMinkContext implements KernelAwareInterface
 
         try {
             assertFileExists($filePath);
-        } catch (Exception $e) {
-            $diff = PHPUnit_Framework_TestFailure::exceptionToString($e);
-            throw new Exception($diff, $e->getCode(), $e);
+        } catch (\Exception $e) {
+            $diff = \PHPUnit_Framework_TestFailure::exceptionToString($e);
+            throw new \Exception($diff, $e->getCode(), $e);
         }
 
         $size = getimagesize($filePath);
@@ -373,9 +373,9 @@ class FileContext extends RawMinkContext implements KernelAwareInterface
 
         try {
             assertContains((string) $text, $this->output);
-        } catch (Exception $e) {
-            $diff = PHPUnit_Framework_TestFailure::exceptionToString($e);
-            throw new Exception($diff, $e->getCode(), $e);
+        } catch (\Exception $e) {
+            $diff = \PHPUnit_Framework_TestFailure::exceptionToString($e);
+            throw new \Exception($diff, $e->getCode(), $e);
         }
     }
 

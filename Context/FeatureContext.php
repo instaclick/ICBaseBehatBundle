@@ -5,12 +5,10 @@
 
 namespace IC\Bundle\Base\BehatBundle\Context;
 
-use Behat\Behat\Event\BaseScenarioEvent;
 use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Symfony2Extension\Context\KernelAwareInterface;
-use Guzzle\Http\Client;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 //
@@ -104,6 +102,26 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     * Click element by id
+     *
+     * @param string $id
+     */
+    public function clickElementById($id)
+    {
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($id) {
+            $element = $this->getSession()->getPage()->findById($id);
+
+            if ($element) {
+                $element->click();
+
+                return;
+            }
+
+            throw new \Exception(sprintf('Element with ID [%s] is not found', $id));
+        });
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function clickLink($link)
@@ -178,6 +196,16 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
         if ($driver instanceof Selenium2Driver) {
             $this->getSession()->getDriver()->getWebDriverSession()->window('current')->postSize(array('width' => 1280, 'height' => 1024));
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function switchToIFrame($name = null)
+    {
+        $this->getSubcontext('SpinCommandContext')->spin(function () use ($name) {
+            $this->getSession()->switchToIFrame($name);
+        });
     }
 
     /**
@@ -395,6 +423,9 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      * @param string $option      Label of the option to assert
      * @param string $selectXpath XPath of the selector
      *
+     * @throws \Exception
+     * @throws \Behat\Mink\Exception\ElementNotFoundException
+     *
      * @Then /^(?:|I )should see "(?P<option>(?:[^"]|\\")*)" is selected as selector at XPath "(?P<selectXpath>[^"]*)"$/
      */
     public function assertSelected($option, $selectXpath)
@@ -430,6 +461,8 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
      *
      * @param string $option      Label of the option to assert
      * @param string $selectXpath XPath of the selector
+     *
+     * @throws \Exception
      *
      * @Then /^(?:|I )should not see "(?P<option>(?:[^"]|\\")*)" is selected as selector at XPath "(?P<selectXpath>[^"]*)"$/
      */
@@ -475,10 +508,33 @@ class FeatureContext extends MinkContext implements KernelAwareInterface
     }
 
     /**
+     * Get attribute value by Id
+     *
+     * @param string $id
+     * @param string $selector
+     *
+     * @return mixed
+     */
+    public function getSelectorValueById($id, $selector)
+    {
+        return $this->getSubcontext('SpinCommandContext')->spin(function () use ($id, $selector) {
+            $element = $this->getSession()->getPage()->findById($id);
+
+            if ($element) {
+                return $element->getAttribute($selector);
+            }
+
+            throw new \Exception(sprintf('Element with ID [%s] is not found', $id));
+        });
+    }
+
+    /**
      * Selects option in select field with specified XPath.
      *
      * @param string $option      Label of the option to select
      * @param string $selectXpath XPath of the selector
+     *
+     * @throws \Exception
      *
      * @When /^(?:|I )select "(?P<option>(?:[^"]|\\")*)" from selector at XPath "(?P<selectXpath>[^"]*)"$/
      */

@@ -18,12 +18,12 @@ use SensioLabs\Behat\PageObjectExtension\PageObject\Element;
 class Form extends Element
 {
     /**
-     * @var array $handlerList
+     * @var array
      */
     private $handlerList = array();
 
     /**
-     * @var array $listenerList
+     * @var array
      */
     private $listenerList = array();
 
@@ -57,8 +57,8 @@ class Form extends Element
     /**
      * Attach an property handler to a form element.
      *
-     * @param string                                                       $property
-     * @param \IC\Bundle\Base\BehatBundle\Form\FormElementHandlerInterface $formElementHandler
+     * @param string                                                   $property
+     * @param \IC\Bundle\Base\BehatBundle\Form\ElementHandlerInterface $formElementHandler
      *
      * @return \IC\Bundle\Base\BehatBundle\PageObject\Element\Form
      */
@@ -75,6 +75,8 @@ class Form extends Element
      * Set the form data.
      *
      * @param array $data
+     *
+     * @throws \InvalidArgumentException
      *
      * @return \IC\Bundle\Base\BehatBundle\PageObject\Element\Form
      */
@@ -121,6 +123,8 @@ class Form extends Element
      * Retrieve the form error list.
      *
      * @param array $keyList Fields to restrict lookups to
+     *
+     * @throws \InvalidArgumentException
      *
      * @return array
      */

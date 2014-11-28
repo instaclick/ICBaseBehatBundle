@@ -40,13 +40,6 @@ class FileContext extends RawMinkContext implements KernelAwareInterface
     private $kernel;
 
     /**
-     * @var array
-     */
-    private $commandDictionary = array(
-        'ic:affiliate:tracking:ppl:status' => 'IC\Bundle\Affiliate\TrackingBundle\Command\PPLStatusCommand',
-        'ic:base:riak:bucket:declare'      => 'IC\Bundle\Base\RiakBundle\Command\RiakBucketPropertyListCommand');
-
-    /**
      * {@inheritdoc}
      */
     public function setKernel(KernelInterface $kernel)
@@ -407,17 +400,10 @@ class FileContext extends RawMinkContext implements KernelAwareInterface
     public function iRunCommand(TableNode $table)
     {
         $commandHash = $table->getHash();
-        $commandArgs = array();
-
-        foreach ($commandHash[0] as $key => $value) {
-            $commandArgs[$key] = $value;
-        }
-
-        $commandName = $this->commandDictionary[$commandHash[0]['command']];
-
+        $commandArgs = $commandHash[0];
         $application = new Application($this->kernel);
-        $application->add(new $commandName());
-        $command = $application->find($commandArgs['command']);
+        $command     = $application->find($commandArgs['command']);
+
         $this->tester = new CommandTester($command);
         $this->tester->execute($commandArgs);
     }

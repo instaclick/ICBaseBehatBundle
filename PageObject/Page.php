@@ -6,7 +6,6 @@
 namespace IC\Bundle\Base\BehatBundle\PageObject;
 
 use Behat\Mink\Session;
-use IC\Bundle\Base\BehatBundle\PageObject\ComponentFactory;
 use SensioLabs\Behat\PageObjectExtension\Context\PageFactoryInterface;
 use SensioLabs\Behat\PageObjectExtension\PageObject\Exception\ElementNotFoundException;
 use SensioLabs\Behat\PageObjectExtension\PageObject\Page as BasePage;
